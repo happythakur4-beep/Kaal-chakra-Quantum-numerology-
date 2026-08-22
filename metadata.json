@@ -1,0 +1,6 @@
+{
+  "name": "Kaal Chakra - Quantum Numerology",
+  "description": "The complete Occult Science & Vedic Astrology Platform featuring Aaj Ka Panchang, Janam Kundli, Kundli Milan, Lal Kitab Teva, KP Krishnamurti Paddhati, Grah Gochar, Dainik Rashifal, Ratna Upay, and AI Daivajna Guru.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-cinzel: 'Cinzel', serif;
+    --font-caslon: 'Libre Caslon Text', 'Lora', serif;
+    --font-cormorant: 'Cormorant Garamond', 'Cinzel', serif;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  body {
+    font-family: 'Cormorant Garamond', 'Cinzel', 'Lora', serif;
+  }
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-cinzel-dec {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+}
+
+.font-caslon {
+  font-family: 'Libre Caslon Text', 'Lora', serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', 'Cinzel', serif;
+}
+
+.font-serif {
+  font-family: 'Cormorant Garamond', 'Cinzel', 'Libre Caslon Text', 'Lora', serif;
+}
+
+.font-sans-modern {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Glassmorphism Dark */
+.glassmorphism-dark {
+  background: rgba(18, 18, 26, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+}
+
+/* Glassmorphism Light / Celestial */
+.glassmorphism-light {
+  background: rgba(254, 252, 246, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  box-shadow: 0 8px 32px rgba(180, 140, 60, 0.08);
+}
+
+/* Gold glow effects */
+.shadow-gold-soft {
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+}
+
+.shadow-gold-intense {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.55), 0 0 60px rgba(212, 175, 55, 0.2);
+}
+
+.shadow-maroon-glow {
+  box-shadow: 0 0 20px rgba(138, 0, 26, 0.45);
+}
+
+.shadow-light-glow {
+  box-shadow: 0 4px 24px rgba(197, 160, 89, 0.18);
+}
+
+/* 3D and Glowing Text Effects */
+.text-3d-gold {
+  text-shadow: 
+    0 1px 0 #ecd18a,
+    0 2px 0 #d4af37,
+    0 3px 0 #b38b22,
+    0 4px 6px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.text-3d-celestial {
+  text-shadow: 
+    0 1px 0 #fff,
+    0 2px 2px rgba(0, 0, 0, 0.15),
+    0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.65), 0 0 24px rgba(212, 175, 55, 0.3);
+}
+
+.text-glow-amber {
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.7), 0 0 20px rgba(245, 158, 11, 0.35);
+}
+
+.text-glow-crimson {
+  text-shadow: 0 0 12px rgba(225, 29, 72, 0.6);
+}
+
+.border-gold-glow {
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.25), inset 0 0 10px rgba(212, 175, 55, 0.1);
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+
+/* Container hover states: isolates transitions to border, shadow, and GPU transform to prevent content flickering */
+.container-hover-tactile {
+  transition-property: border-color, box-shadow, transform;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, box-shadow, border-color;
+}
+
+/* Text Gradients */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fff2cc 0%, #d4af37 50%, #aa8012 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gold-gradient-light {
+  background: linear-gradient(135deg, #7a5c10 0%, #a67c1e 50%, #5c440a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Button Glow & Gradients */
+.bg-maroon-gradient {
+  background: linear-gradient(135deg, #5c0011 0%, #8a001a 50%, #630517 100%);
+}
+
+.bg-gold-gradient-btn {
+  background: linear-gradient(135deg, #c5a059 0%, #e5c98d 50%, #a8823b 100%);
+}
+
+.bg-celestial-light-btn {
+  background: linear-gradient(135deg, #bfa063 0%, #9e7d3b 100%);
+}
+
+.btn-soft-glow {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-soft-glow::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #d4af37, #fdf2d1, #d4af37);
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  filter: blur(8px);
+}
+
+.btn-soft-glow:hover::before {
+  opacity: 0.85;
+}
+
+/* Subtle slow rotation for the sacred background mandala */
+@keyframes slow-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes reverse-spin {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes pulse-gentle {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.03); }
+}
+
+.animate-spin-slow {
+  animation: slow-spin 120s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+  animation: reverse-spin 100s linear infinite;
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 6s ease-in-out infinite;
+}
+
+/* Custom scrollbar for aesthetic occult feel */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 10, 15, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.7);
+}
+
+/* Print Styles for Destiny Profile & PDF Export */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 8mm;
+  }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html, body {
+    background: #faf8f2 !important;
+    color: #2d2105 !important;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .no-print, header, footer, nav, button.no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-sheet {
+    background: #faf8f2 !important;
+    color: #2d2105 !important;
+    box-shadow: none !important;
+    border: 2px solid #c5a059 !important;
+    border-radius: 12px !important;
+    margin: 0 auto !important;
+    padding: 24px !important;
+    max-width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Make sure headings and gold text remain high-contrast on paper/PDF */
+  .text-gold-gradient, .text-3d-gold, .text-3d-celestial {
+    -webkit-text-fill-color: #3b2b0a !important;
+    color: #3b2b0a !important;
+    text-shadow: none !important;
+  }
+
+  svg {
+    filter: none !important;
+  }
+}
+
+
