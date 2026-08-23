@@ -48,11 +48,14 @@ import {
   ChevronDown,
   Layers,
   Flame,
-  Activity
+  Activity,
+  Scale
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'motion/react';
 import { cosmicAudio } from '../../utils/audioSynthesizer';
+import { Tesla3DLogoIcon } from '../Tesla369/Tesla3DLogoIcon';
+import { FuturisticTeslaPortalButton } from '../Tesla369/FuturisticTeslaPortalButton';
 
 interface LandingHeroScreenProps {
   theme: ThemeMode;
@@ -312,6 +315,7 @@ export const LandingHeroScreen: React.FC<LandingHeroScreenProps> = ({
     const props = { className: `w-5 h-5 sm:w-6 sm:h-6 ${iconColor || 'text-[#d4af37]'}` };
     switch (iconName) {
       case 'Laptop': return <Laptop {...props} />;
+      case 'Scale': return <Scale {...props} />;
       case 'Briefcase': return <Briefcase {...props} />;
       case 'BookMarked': return <BookMarked {...props} />;
       case 'PhoneCall': return <PhoneCall {...props} />;
@@ -574,9 +578,24 @@ export const LandingHeroScreen: React.FC<LandingHeroScreenProps> = ({
 
             {/* Primary Action Buttons */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3.5 pt-2">
+              <FuturisticTeslaPortalButton
+                variant="large"
+                label="369 TESLA PORTAL"
+                subLabel="SPEED OF LIGHT • BLACK HOLE"
+                onClick={() => onNavigate('tesla-369')}
+              />
+
+              <button
+                onClick={() => onNavigate('karma')}
+                className="px-4 sm:px-5 py-3 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-emerald-600 text-slate-950 font-cinzel font-bold text-xs sm:text-sm flex items-center gap-2 shadow-[0_4px_18px_rgba(245,158,11,0.4)] hover:brightness-110 transition-all cursor-pointer group"
+              >
+                <Scale className="w-4 h-4 text-slate-950 group-hover:rotate-12 transition-transform" />
+                <span>Karma Ledger (कर्म दर्पण)</span>
+              </button>
+
               <button
                 onClick={() => onNavigate('kundli')}
-                className="px-4 sm:px-5 py-2.5 rounded-xl bg-gold-gradient text-gray-950 font-cinzel font-bold text-xs sm:text-sm flex items-center gap-2 shadow-[0_4px_18px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all cursor-pointer group"
+                className="px-4 sm:px-5 py-3 rounded-xl bg-gold-gradient text-gray-950 font-cinzel font-bold text-xs sm:text-sm flex items-center gap-2 shadow-[0_4px_18px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all cursor-pointer group"
               >
                 <Compass className="w-4 h-4 text-gray-950 group-hover:rotate-45 transition-transform" />
                 <span>Cast Janam Kundli</span>

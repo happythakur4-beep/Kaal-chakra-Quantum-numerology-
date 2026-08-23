@@ -48,10 +48,20 @@ import { VastuScreen } from './components/Screens/VastuScreen';
 import { PrashnavaliScreen } from './components/Screens/PrashnavaliScreen';
 import { BabyNamesScreen } from './components/Screens/BabyNamesScreen';
 import { JapaMalaScreen } from './components/Screens/JapaMalaScreen';
+import { KarmaScreen } from './components/Screens/KarmaScreen';
+import { TeslaPortal369Screen } from './components/Screens/TeslaPortal369Screen';
+import { TeslaCyberPortalNexus } from './components/Tesla369/TeslaCyberPortalNexus';
+import { BlackHoleWarpTransition } from './components/Tesla369/BlackHoleWarpTransition';
+import { UnifiedCosmicWormholeEngine } from './components/CosmicTransitionEngine/UnifiedCosmicWormholeEngine';
+import { motion, AnimatePresence } from 'motion/react';
 
 export function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('landing');
+  const [pendingScreen, setPendingScreen] = useState<ScreenType>('landing');
+  const [fromScreen, setFromScreen] = useState<ScreenType>('landing');
+  const [isWormholeNavigating, setIsWormholeNavigating] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>('dark');
+  const [isBlackHoleWarpPlaying, setIsBlackHoleWarpPlaying] = useState(false);
   const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [destinyProfile, setDestinyProfile] = useState<DestinyProfileData>(DEFAULT_DESTINY_PROFILE);
   const [reports, setReports] = useState(INITIAL_REPORTS);
@@ -97,7 +107,7 @@ export function App() {
       name: name || prev.name,
       email: email || prev.email,
     }));
-    setCurrentScreen('portal');
+    handleNavigate('portal');
   };
 
   // Full Custom Unlock from Modal
@@ -119,7 +129,7 @@ export function App() {
       birthCity,
       learningResonance: Math.min(99, prev.learningResonance + 5),
     }));
-    setCurrentScreen('report');
+    handleNavigate('report');
   };
 
   // Contribution Paid from Institute Portal
@@ -129,7 +139,7 @@ export function App() {
 
   // Open specific course & enroll
   const handleOpenCourse = (courseId: string) => {
-    setCurrentScreen('academy');
+    handleNavigate('academy');
   };
 
   const handleEnrollCourse = (courseId: string) => {
@@ -174,17 +184,65 @@ export function App() {
     setIsFeatureModalOpen(true);
   };
 
+  // Unified Cosmic Wormhole & Nebula Drift Navigation Router
+  const handleNavigate = (targetScreen: ScreenType) => {
+    if (targetScreen === currentScreen) return;
+
+    if (targetScreen === 'tesla-369') {
+      setIsBlackHoleWarpPlaying(true);
+      setCurrentScreen('tesla-369');
+      return;
+    }
+
+    setFromScreen(currentScreen);
+    setPendingScreen(targetScreen);
+    setIsWormholeNavigating(true);
+
+    // Midpoint switch: swap screen state while wormhole vortex is at peak intensity
+    setTimeout(() => {
+      setCurrentScreen(targetScreen);
+    }, 550);
+  };
+
+  const handleTransitionFinish = () => {
+    setIsWormholeNavigating(false);
+  };
+
+  // 100% Isolated Standalone Tesla 3-6-9 Cyber-Hacking Portal Environment
+  if (currentScreen === 'tesla-369') {
+    return (
+      <TeslaCyberPortalNexus
+        onExit={() => handleNavigate('landing')}
+        user={user}
+      />
+    );
+  }
+
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-500 relative font-sans ${
       theme === 'dark' ? 'bg-[#07070b] text-gray-100' : 'bg-[#faf7ee] text-[#3b2b0a]'
     }`}>
+      {/* Unified Cosmic Wormhole & Nebula Drift Transition Engine */}
+      <UnifiedCosmicWormholeEngine
+        isNavigating={isWormholeNavigating}
+        fromScreen={fromScreen}
+        toScreen={pendingScreen}
+        onTransitionComplete={handleTransitionFinish}
+        theme={theme}
+      />
+
+      {/* Special Black Hole Singularity Warp Fullscreen Overlay */}
+      {isBlackHoleWarpPlaying && (
+        <BlackHoleWarpTransition onComplete={() => setIsBlackHoleWarpPlaying(false)} />
+      )}
+
       {/* Sacred Rotating Sri Yantra Mandala Canvas Background */}
       <MandalaBackground theme={theme} />
 
       {/* Primary Navigation Header */}
       <Header
         currentScreen={currentScreen}
-        onNavigate={setCurrentScreen}
+        onNavigate={handleNavigate}
         theme={theme}
         onToggleTheme={handleToggleTheme}
         user={user}
@@ -194,173 +252,199 @@ export function App() {
         onOpenCourse={handleOpenCourse}
       />
 
-      {/* Screen Router Container */}
+      {/* Screen Router Container with Continuous Morphing Animation */}
       <div className="flex-1 flex flex-col relative z-10">
-        {currentScreen === 'landing' && (
-          <LandingHeroScreen
-            theme={theme}
-            activeAura={user.activeAura}
-            onNavigate={setCurrentScreen}
-            onUnlockReport={handleHeroUnlock}
-            onOpenDrawer={() => setIsDrawerOpen(true)}
-            onOpenAstrologerChat={handleOpenAstrologerChat}
-            onOpenFeatureModal={handleOpenGridTileModal}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentScreen}
+            initial={{ opacity: 0, scale: 0.97, filter: 'blur(6px)' }}
+            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+            className="flex-1 flex flex-col w-full"
+          >
+            {currentScreen === 'landing' && (
+              <LandingHeroScreen
+                theme={theme}
+                activeAura={user.activeAura}
+                onNavigate={handleNavigate}
+                onUnlockReport={handleHeroUnlock}
+                onOpenDrawer={() => setIsDrawerOpen(true)}
+                onOpenAstrologerChat={handleOpenAstrologerChat}
+                onOpenFeatureModal={handleOpenGridTileModal}
+              />
+            )}
 
-        {currentScreen === 'portal' && (
-          <InstitutePortalScreen
-            theme={theme}
-            user={user}
-            reports={reports}
-            consultations={consultations}
-            onNavigate={setCurrentScreen}
-            onSelectAura={handleSelectAura}
-            onUnlockDestinyReport={handleUnlockDestinyReport}
-            onViewReport={() => setCurrentScreen('report')}
-            onBookConsultation={() => setCurrentScreen('consultations')}
-          />
-        )}
+            {currentScreen === 'portal' && (
+              <InstitutePortalScreen
+                theme={theme}
+                user={user}
+                reports={reports}
+                consultations={consultations}
+                onNavigate={handleNavigate}
+                onSelectAura={handleSelectAura}
+                onUnlockDestinyReport={handleUnlockDestinyReport}
+                onViewReport={() => handleNavigate('report')}
+                onBookConsultation={() => handleNavigate('consultations')}
+              />
+            )}
 
-        {currentScreen === 'report' && (
-          <DestinyReportScreen
-            theme={theme}
-            profile={destinyProfile}
-            onRecalculate={() => setIsReportModalOpen(true)}
-          />
-        )}
+            {currentScreen === 'report' && (
+              <DestinyReportScreen
+                theme={theme}
+                profile={destinyProfile}
+                onRecalculate={() => setIsReportModalOpen(true)}
+              />
+            )}
 
-        {currentScreen === 'mentor' && (
-          <AICosmicMentorScreen
-            theme={theme}
-            user={user}
-          />
-        )}
+            {currentScreen === 'mentor' && (
+              <AICosmicMentorScreen
+                theme={theme}
+                user={user}
+              />
+            )}
 
-        {currentScreen === 'panchang' && (
-          <PanchangMuhuratScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'panchang' && (
+              <PanchangMuhuratScreen
+                theme={theme}
+              />
+            )}
 
-        {currentScreen === 'kundli' && (
-          <KundliScreen
-            theme={theme}
-            user={user}
-          />
-        )}
+            {currentScreen === 'kundli' && (
+              <KundliScreen
+                theme={theme}
+                user={user}
+              />
+            )}
 
-        {currentScreen === 'matching' && (
-          <KundliMatchingScreen
-            theme={theme}
-            user={user}
-          />
-        )}
+            {currentScreen === 'matching' && (
+              <KundliMatchingScreen
+                theme={theme}
+                user={user}
+              />
+            )}
 
-        {currentScreen === 'lalkitab' && (
-          <LalKitabScreen
-            theme={theme}
-            user={user}
-          />
-        )}
+            {currentScreen === 'lalkitab' && (
+              <LalKitabScreen
+                theme={theme}
+                user={user}
+              />
+            )}
 
-        {currentScreen === 'kp' && (
-          <KPAstrologyScreen
-            theme={theme}
-            user={user}
-          />
-        )}
+            {currentScreen === 'kp' && (
+              <KPAstrologyScreen
+                theme={theme}
+                user={user}
+              />
+            )}
 
-        {currentScreen === 'rashifal' && (
-          <RashifalTarotScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'rashifal' && (
+              <RashifalTarotScreen
+                theme={theme}
+              />
+            )}
 
-        {currentScreen === 'transits' && (
-          <TransitTrackerScreen
-            theme={theme}
-            user={user}
-          />
-        )}
+            {currentScreen === 'transits' && (
+              <TransitTrackerScreen
+                theme={theme}
+                user={user}
+              />
+            )}
 
-        {currentScreen === 'gemstones' && (
-          <GemstoneRemediesScreen
-            theme={theme}
-            user={user}
-          />
-        )}
+            {currentScreen === 'gemstones' && (
+              <GemstoneRemediesScreen
+                theme={theme}
+                user={user}
+              />
+            )}
 
-        {currentScreen === 'numerology' && (
-          <NumerologyScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'numerology' && (
+              <NumerologyScreen
+                theme={theme}
+              />
+            )}
 
-        {currentScreen === 'vastu' && (
-          <VastuScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'vastu' && (
+              <VastuScreen
+                theme={theme}
+              />
+            )}
 
-        {currentScreen === 'prashnavali' && (
-          <PrashnavaliScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'prashnavali' && (
+              <PrashnavaliScreen
+                theme={theme}
+              />
+            )}
 
-        {currentScreen === 'baby-names' && (
-          <BabyNamesScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'baby-names' && (
+              <BabyNamesScreen
+                theme={theme}
+              />
+            )}
 
-        {currentScreen === 'japa-mala' && (
-          <JapaMalaScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'japa-mala' && (
+              <JapaMalaScreen
+                theme={theme}
+              />
+            )}
 
-        {currentScreen === 'student' && (
-          <StudentDashboardScreen
-            theme={theme}
-            user={user}
-            courses={courses}
-            onNavigate={setCurrentScreen}
-            onOpenCourse={handleOpenCourse}
-            onUpdateProgress={handleEnrollCourse}
-            onSelectAura={handleSelectAura}
-          />
-        )}
+            {currentScreen === 'karma' && (
+              <KarmaScreen
+                theme={theme}
+                onNavigate={handleNavigate}
+              />
+            )}
 
-        {currentScreen === 'practice' && (
-          <QuantumPracticeScreen
-            theme={theme}
-          />
-        )}
+            {currentScreen === 'tesla-369' && (
+              <TeslaPortal369Screen
+                theme={theme}
+                user={user}
+                onTriggerBlackHoleWarp={() => setIsBlackHoleWarpPlaying(true)}
+              />
+            )}
 
-        {currentScreen === 'academy' && (
-          <AcademyCoursesScreen
-            theme={theme}
-            courses={courses}
-            onSelectCourse={handleOpenCourse}
-            onEnroll={handleEnrollCourse}
-          />
-        )}
+            {currentScreen === 'student' && (
+              <StudentDashboardScreen
+                theme={theme}
+                user={user}
+                courses={courses}
+                onNavigate={handleNavigate}
+                onOpenCourse={handleOpenCourse}
+                onUpdateProgress={handleEnrollCourse}
+                onSelectAura={handleSelectAura}
+              />
+            )}
 
-        {currentScreen === 'consultations' && (
-          <ConsultationsScreen
-            theme={theme}
-            consultations={consultations}
-            onBookSuccess={handleBookConsultationSuccess}
-          />
-        )}
+            {currentScreen === 'practice' && (
+              <QuantumPracticeScreen
+                theme={theme}
+              />
+            )}
+
+            {currentScreen === 'academy' && (
+              <AcademyCoursesScreen
+                theme={theme}
+                courses={courses}
+                onSelectCourse={handleOpenCourse}
+                onEnroll={handleEnrollCourse}
+              />
+            )}
+
+            {currentScreen === 'consultations' && (
+              <ConsultationsScreen
+                theme={theme}
+                consultations={consultations}
+                onBookSuccess={handleBookConsultationSuccess}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Footer Bar */}
       <Footer
         theme={theme}
-        onNavigate={setCurrentScreen}
+        onNavigate={handleNavigate}
       />
 
       {/* AstroSage Slide-Out Accordion Drawer Menu (Screenshot 1) */}
@@ -368,7 +452,7 @@ export function App() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         theme={theme}
-        onNavigate={setCurrentScreen}
+        onNavigate={handleNavigate}
         onOpenSubFeatureModal={handleOpenCategorySubModal}
         onOpenAstrologerChat={handleOpenAstrologerChat}
       />
@@ -381,7 +465,7 @@ export function App() {
         category={selectedCategory}
         gridTile={selectedGridTile}
         singleSubFeature={selectedSubFeature}
-        onNavigate={setCurrentScreen}
+        onNavigate={handleNavigate}
         onOpenAstrologerChat={handleOpenAstrologerChat}
       />
 

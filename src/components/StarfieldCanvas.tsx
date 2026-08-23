@@ -486,21 +486,25 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
         const tailX = s.x - Math.cos(s.angle) * s.length;
         const tailY = s.y - Math.sin(s.angle) * s.length;
 
-        const grad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
-        grad.addColorStop(0, 'rgba(212, 175, 55, 0)');
-        grad.addColorStop(0.7, 'rgba(255, 242, 209, ' + s.alpha * 0.8 + ')');
-        grad.addColorStop(1, 'rgba(255, 255, 255, ' + s.alpha + ')');
+        if (Number.isFinite(tailX) && Number.isFinite(tailY) && Number.isFinite(s.x) && Number.isFinite(s.y)) {
+          try {
+            const grad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
+            grad.addColorStop(0, 'rgba(212, 175, 55, 0)');
+            grad.addColorStop(0.7, 'rgba(255, 242, 209, ' + s.alpha * 0.8 + ')');
+            grad.addColorStop(1, 'rgba(255, 255, 255, ' + s.alpha + ')');
 
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(tailX, tailY);
-        ctx.lineTo(s.x, s.y);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = s.thickness;
-        ctx.shadowColor = '#ffd700';
-        ctx.shadowBlur = 10;
-        ctx.stroke();
-        ctx.restore();
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(tailX, tailY);
+            ctx.lineTo(s.x, s.y);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = s.thickness;
+            ctx.shadowColor = '#ffd700';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+            ctx.restore();
+          } catch (e) {}
+        }
 
         s.x += Math.cos(s.angle) * s.speed;
         s.y += Math.sin(s.angle) * s.speed;

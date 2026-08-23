@@ -22,7 +22,8 @@ import {
   MoreHorizontal,
   Bot,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Scale
 } from 'lucide-react';
 import { cosmicAudio } from '../utils/audioSynthesizer';
 
@@ -52,6 +53,7 @@ export const AstroSageDrawer: React.FC<AstroSageDrawerProps> = ({
     const props = { className: "w-4 h-4 flex-shrink-0", style: { color } };
     switch (iconName) {
       case 'Home': return <Home {...props} />;
+      case 'Scale': return <Scale {...props} />;
       case 'Sparkles': return <Sparkles {...props} />;
       case 'Star': return <Star {...props} />;
       case 'Compass': return <Compass {...props} />;

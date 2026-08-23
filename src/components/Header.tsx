@@ -29,9 +29,12 @@ import {
   Scroll,
   Baby,
   Disc,
-  Radio
+  Radio,
+  Scale
 } from 'lucide-react';
 import { cosmicAudio } from '../utils/audioSynthesizer';
+import { Tesla3DLogoIcon } from './Tesla369/Tesla3DLogoIcon';
+import { FuturisticTeslaPortalButton } from './Tesla369/FuturisticTeslaPortalButton';
 
 interface HeaderProps {
   currentScreen: ScreenType;
@@ -73,6 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     { id: 'landing' as ScreenType, label: 'Home', icon: <Home className="w-3.5 h-3.5" /> },
+    { id: 'karma' as ScreenType, label: 'Karma (कर्म)', icon: <Scale className="w-3.5 h-3.5 text-amber-400" /> },
     { id: 'mentor' as ScreenType, label: 'AI Daivajna', icon: <Bot className="w-3.5 h-3.5 text-amber-400" /> },
     { id: 'panchang' as ScreenType, label: 'Aaj Ka Panchang', icon: <Calendar className="w-3.5 h-3.5 text-amber-300" /> },
     { id: 'kundli' as ScreenType, label: 'Janam Kundli', icon: <Compass className="w-3.5 h-3.5 text-orange-300" /> },
@@ -87,6 +91,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'kp' as ScreenType, label: 'KP Astrology', icon: <Layers className="w-3.5 h-3.5 text-blue-400" /> },
     { id: 'transits' as ScreenType, label: 'Grah Gochar', icon: <Orbit className="w-3.5 h-3.5 text-indigo-300" /> },
     { id: 'gemstones' as ScreenType, label: 'Ratna Upay', icon: <Gem className="w-3.5 h-3.5 text-emerald-300" /> },
+    { id: 'tesla-369' as ScreenType, label: '369 Tesla Portal', icon: <Tesla3DLogoIcon size={16} interactive={false} showGlow={false} /> },
     { id: 'practice' as ScreenType, label: 'Occult Lab', icon: <SlidersHorizontal className="w-3.5 h-3.5" /> },
     { id: 'portal' as ScreenType, label: 'Portal', icon: <Info className="w-3.5 h-3.5" /> },
   ];
@@ -165,6 +170,15 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right: Action Buttons (Sign In & Get Started) + Utility Tools */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* 369 Tesla Portal Quick Launch Futuristic 3D Button */}
+          <FuturisticTeslaPortalButton
+            variant="compact"
+            label="369 PORTAL"
+            subLabel="LIGHTSPEED"
+            onClick={() => onNavigate('tesla-369')}
+            showGlow={currentScreen === 'tesla-369'}
+          />
+
           {/* Meditative Ambient Cosmic Soundscape Toggle */}
           <button
             id="header-cosmic-soundscape-btn"

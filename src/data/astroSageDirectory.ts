@@ -154,6 +154,21 @@ export const AI_ASTROLOGERS_LIST: AIAstrologer[] = [
 
 export const ASTROSAGE_NAV_MENU: AstroSageCategory[] = [
   {
+    id: 'karma',
+    title: 'Karma',
+    hindiTitle: 'कर्म फल दर्पण',
+    isNew: true,
+    iconName: 'Scale',
+    color: '#d4af37',
+    subFeatures: [
+      { id: 'karma-ledger', title: 'Complete Karmic Ledger', description: 'Interactive balance sheet of Punya deeds vs Papa misdeeds', targetScreen: 'karma' },
+      { id: 'karma-punya', title: 'Good Deeds (Punya) Tracker', description: 'Log Annadana, Vidya Dana, Go-Seva, and truthfulness merit', targetScreen: 'karma' },
+      { id: 'karma-papa', title: 'Sins & Mistakes Confession', description: 'Evaluate karmic toll of speech, thought, and physical errors', targetScreen: 'karma' },
+      { id: 'karma-debts', title: '5 Cosmic Debts (Pancha Rina)', description: 'Ancestral, cosmic, and societal debt clearance status', targetScreen: 'karma' },
+      { id: 'karma-remedies', title: 'Prayashchitta (Atonement) Vidhi', description: 'Vedic purificatory sound frequencies, mantras, and fasting vows', targetScreen: 'karma' }
+    ]
+  },
+  {
     id: 'home',
     title: 'Home',
     hindiTitle: 'होम पेज',
@@ -377,6 +392,24 @@ export const ASTROSAGE_NAV_MENU: AstroSageCategory[] = [
 ];
 
 export const ASTROSAGE_HOME_GRID_TILES: AstroGridTile[] = [
+  {
+    id: 'karma-matrix-ledger',
+    title: 'Karma & Dharmic Ledger',
+    hindiTitle: 'कर्म फल दर्पण व पाप-पुण्य लेखा',
+    iconName: 'Scale',
+    category: 'Karma',
+    badge: 'New Feature',
+    bgColor: 'bg-amber-500/20',
+    iconColor: 'text-amber-400',
+    description: 'Track good deeds (Punya), transgressions (Papa), Sanchita-Prarabdha balance, 5 cosmic debts (Pancha Rina), and Prayashchitta remedies.',
+    targetScreen: 'karma',
+    subFeatures: [
+      { id: 'karm-punya', title: 'Good Deeds (Punya) Tracker', description: 'Log and calculate merit from Annadana, Vidya Dana, Go-Seva, and truthfulness', targetScreen: 'karma' },
+      { id: 'karm-papa', title: 'Sins & Mistakes Confession Ledger', description: 'Evaluate karmic toll of speech cruelty, deception, envy, and duty neglect', targetScreen: 'karma' },
+      { id: 'karm-debts', title: '5 Sacred Cosmic Debts (Pancha Rina)', description: 'Ancestral (Pitru), nature (Deva), and teacher (Rishi) clearance balance', targetScreen: 'karma' },
+      { id: 'karm-remedy', title: 'Prayashchitta (Atonement) Audio & Upayas', description: 'Sacred frequencies, Gayatri/Mrityunjaya chanting, and restorative charity', targetScreen: 'karma' }
+    ]
+  },
   {
     id: 'dhruv-software',
     title: 'Dhruv Astro Software',

@@ -1,6 +1,8 @@
 export type ScreenType = 
   | 'landing' 
   | 'portal' 
+  | 'tesla-369'
+  | 'karma'
   | 'report' 
   | 'kundli'
   | 'panchang'
@@ -124,3 +126,71 @@ export interface TarotCard {
   affirmation: string;
   imageUrl: string;
 }
+
+export type CelestialType = 'planet' | 'star' | 'moon' | 'galaxy' | 'nebula' | 'black-hole' | 'vortex-node';
+
+export interface CelestialBodyData {
+  id: string;
+  name: string;
+  sanskritName?: string;
+  type: CelestialType;
+  orbitalPeriod?: string;
+  distanceFromSun?: string;
+  vibrationalFrequencyHz: number;
+  solfeggioKey?: string;
+  chakraResonance?: string;
+  teslaHarmonicNumber: 3 | 6 | 9 | number;
+  vedicGraha?: string;
+  color: string;
+  glowColor: string;
+  texturePattern?: string;
+  radius: number; // For visualization sizing
+  orbitDistance: number; // For orrery layout
+  speed: number;
+  description: string;
+  teslaInsight: string;
+  vedicCosmology: string;
+  quantumAffirmation: string;
+  keyFacts: { label: string; value: string }[];
+}
+
+export interface TeslaVortexNode {
+  number: number;
+  isDivineTrinity: boolean; // 3, 6, or 9
+  frequencyHz: number;
+  solfeggioTitle: string;
+  vortexMeaning: string;
+  vedicParallel: string;
+  color: string;
+  connections: number[];
+}
+
+export type CyberTab = 'planets' | 'sudarshan' | 'galaxy' | 'terminal' | 'vortex' | 'tune-thrive' | 'blackhole' | 'chakras' | 'etheric';
+
+export interface SacredExhibitData {
+  id: string;
+  title: string;
+  sanskritTitle: string;
+  subtitle: string;
+  type: 'image' | 'video' | 'interactive';
+  imageSrc: string;
+  videoSrc?: string;
+  tag: string;
+  chakraResonance: string;
+  solfeggioHz: number;
+  solfeggioName: string;
+  teslaHarmonic: 3 | 6 | 9 | '3-6-9';
+  shortDescription: string;
+  fullPhilosophy: string;
+  scripturalPassage: {
+    sanskrit: string;
+    transliteration: string;
+    english: string;
+    source: string;
+  };
+  scientificTeslaInsight: string;
+  sacredSymbolism: { label: string; value: string }[];
+  keyPowers: string[];
+}
+
+

@@ -219,6 +219,21 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     badge: 'Ratna Upay'
   },
   {
+    id: 'feat-tesla-369',
+    title: '369 Tesla Portal (Cosmic Vortex & Celestial Orrery)',
+    hindiTitle: '३६९ टेस्ला पोर्टल एवं ब्रह्मांडीय ग्रह चक्र',
+    subtitle: 'Planets, Galaxies, Black Hole Warp & 3-6-9 Vortex Math',
+    category: 'engine',
+    categoryLabel: 'Quantum Celestial Portal',
+    iconName: 'Zap',
+    iconColor: 'text-[#ffd700]',
+    keywords: ['tesla', '369', 'portal', 'tesla portal', 'black hole', 'warp', 'planets', 'galaxies', 'universe', 'solfeggio', 'vortex', 'celestial', 'frequency', 'akasha', 'wardenclyffe', 'cousto'],
+    description: 'Enter the 369 Tesla Portal through a relativistic black hole warp to explore planetary acoustics, deep galaxies, Hans Cousto Cosmic Octave, and 3-6-9 vortex math.',
+    targetScreen: 'tesla-369',
+    actionType: 'navigate',
+    badge: '3D 369 Portal'
+  },
+  {
     id: 'feat-mentor',
     title: 'AI Daivajna (Cosmic Astrological Mentor)',
     hindiTitle: 'एआई दैवज्ञ (ज्योतिष मार्गदर्शक)',
@@ -391,6 +406,7 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
 ];
 
 export const POPULAR_SEARCH_CHIPS = [
+  { label: '⚡ 369 Tesla Portal', query: 'Tesla' },
   { label: 'Kundli Milan', query: 'Kundli Milan' },
   { label: 'Lo Shu Grid', query: 'Lo Shu' },
   { label: 'Dainik Rashifal', query: 'Rashifal' },
