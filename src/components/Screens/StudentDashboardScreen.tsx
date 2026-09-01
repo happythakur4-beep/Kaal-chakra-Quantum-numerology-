@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScreenType, ThemeMode, UserProfile, CourseModule, AuraType } from '../../types';
 import { SRI_YANTRA_LOGO } from '../../data/mockData';
 import { AuraFieldVisualization, AURA_CONFIGS } from '../AuraFieldVisualization';
+import { AuraParticleBackground } from '../AuraParticleBackground';
 import { 
   Home, 
   BookOpen, 
@@ -18,7 +19,8 @@ import {
   Zap,
   Radio,
   Eye,
-  Sliders
+  Sliders,
+  Wind
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'motion/react';
@@ -134,20 +136,28 @@ export const StudentDashboardScreen: React.FC<StudentDashboardScreenProps> = ({
           />
         </div>
 
-        {/* 1. Top User Profile Section with Bio-Photonic D3 Aura Field */}
+        {/* 1. Top User Profile Section with Bio-Photonic D3 Aura Field & Responsive Aura Particles */}
         <div 
           id="student-user-profile-section"
-          className="relative z-10 mb-5 p-3.5 rounded-2xl border transition-all duration-500 overflow-hidden"
+          className="relative z-10 mb-5 p-3.5 rounded-2xl border transition-all duration-500 overflow-hidden group/profile"
           style={{
-            borderColor: `${auraConfig.primary}40`,
+            borderColor: `${auraConfig.primary}45`,
             background: isDark 
-              ? `linear-gradient(135deg, rgba(16, 16, 24, 0.85), ${auraConfig.primary}12)` 
-              : `linear-gradient(135deg, rgba(255, 255, 255, 0.95), ${auraConfig.primary}15)`,
-            boxShadow: `0 0 20px ${auraConfig.glow}`,
+              ? `linear-gradient(135deg, rgba(14, 14, 22, 0.88), ${auraConfig.primary}15)` 
+              : `linear-gradient(135deg, rgba(255, 255, 255, 0.94), ${auraConfig.primary}18)`,
+            boxShadow: `0 0 24px ${auraConfig.glow}`,
           }}
         >
+          {/* Responsive Subtle Particle System Background reacting to currently selected Aura */}
+          <AuraParticleBackground
+            theme={theme}
+            activeAura={user.activeAura}
+            opacity={isDark ? 0.82 : 0.65}
+            interactive={true}
+          />
+
           {/* Upper Profile Row: Avatar, Name, Aura Badge, and Resonance Gauge */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="relative z-10 flex items-center justify-between gap-2">
             
             {/* User Avatar with dynamic Auric Corona Ring */}
             <div className="flex items-center gap-3">
@@ -244,6 +254,55 @@ export const StudentDashboardScreen: React.FC<StudentDashboardScreenProps> = ({
               </div>
             </div>
 
+          </div>
+
+          {/* Dynamic Aura Flow Pattern Ribbon & Quick Color Selector */}
+          <div className="relative z-10 mt-2.5 pt-2 border-t border-amber-500/15 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Wind 
+                className="w-3 h-3 shrink-0 animate-spin-slow transition-colors duration-500" 
+                style={{ color: auraConfig.primary }}
+              />
+              <span className={`text-[0.62rem] font-cinzel truncate ${isDark ? 'text-gray-300' : 'text-[#5a4313]'}`}>
+                <span className="opacity-70">Flow:</span>{' '}
+                <span className="font-semibold" style={{ color: auraConfig.primary }}>
+                  {user.activeAura === 'Calm Amber' && 'Thermal Updraft (432Hz)'}
+                  {user.activeAura === 'Radiant Rose' && 'Heart Pulse Bloom (528Hz)'}
+                  {user.activeAura === 'Celestial Gold' && 'Solar Vortex (639Hz)'}
+                  {user.activeAura === 'Aetheric Violet' && 'Quantum Wave Stream (852Hz)'}
+                  {user.activeAura === 'Emerald Clarity' && 'Pranic Constellation (963Hz)'}
+                </span>
+              </span>
+            </div>
+
+            {/* Quick 5-Aura Interactive Switching Dots */}
+            <div className="flex items-center gap-1 shrink-0" title="Select Aura & Flow Pattern">
+              {(['Calm Amber', 'Radiant Rose', 'Celestial Gold', 'Aetheric Violet', 'Emerald Clarity'] as AuraType[]).map((auraKey) => {
+                const cfg = AURA_CONFIGS[auraKey];
+                const isSelected = user.activeAura === auraKey;
+                return (
+                  <button
+                    key={auraKey}
+                    id={`profile-aura-dot-${auraKey.toLowerCase().replace(/\s+/g, '-')}`}
+                    onClick={() => handleAuraChange(auraKey)}
+                    title={`Switch to ${auraKey} (${cfg.frequency}Hz)`}
+                    className={`relative w-4 h-4 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${
+                      isSelected 
+                        ? 'scale-125 ring-2 ring-white/90 shadow-md' 
+                        : 'opacity-65 hover:opacity-100 hover:scale-110'
+                    }`}
+                    style={{
+                      backgroundColor: cfg.primary,
+                      boxShadow: isSelected ? `0 0 10px ${cfg.primary}` : undefined,
+                    }}
+                  >
+                    {isSelected && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Expandable Interactive D3 Aura Field Section */}

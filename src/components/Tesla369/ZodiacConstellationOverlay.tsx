@@ -20,6 +20,7 @@ interface ZodiacConstellationOverlayProps {
   hoveredPlanetId?: string | null;
   opacity?: number;
   showLabels?: boolean;
+  highContrast?: boolean;
 }
 
 export const ZODIAC_CONSTELLATIONS: ZodiacConstellation[] = [
@@ -373,6 +374,7 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
   hoveredPlanetId,
   opacity = 0.65,
   showLabels = true,
+  highContrast = false,
 }) => {
   const activePlanet = (hoveredPlanetId || selectedPlanetId || 'earth').toLowerCase();
 
@@ -385,7 +387,7 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
       <defs>
         {/* Constellation Glow Filters */}
         <filter id="star-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="0.4" result="blur" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation={highContrast ? "0.2" : "0.4"} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -393,7 +395,7 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
         </filter>
 
         <filter id="active-star-glow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="0.8" result="blur" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation={highContrast ? "0.4" : "0.8"} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -402,14 +404,14 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
 
         {/* Diagonal Background Inter-Constellation Resonance Lines */}
         <linearGradient id="interstellar-line" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00f3ff" stopOpacity="0.05" />
-          <stop offset="50%" stopColor="#fbbf24" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#00f3ff" stopOpacity="0.05" />
+          <stop offset="0%" stopColor="#00f3ff" stopOpacity={highContrast ? "0.2" : "0.05"} />
+          <stop offset="50%" stopColor="#fbbf24" stopOpacity={highContrast ? "0.35" : "0.15"} />
+          <stop offset="100%" stopColor="#00f3ff" stopOpacity={highContrast ? "0.2" : "0.05"} />
         </linearGradient>
       </defs>
 
       {/* 1. FAINT INTERCONNECTING WEB OF CELESTIAL MERIDIANS (Across all constellations) */}
-      <g stroke="url(#interstellar-line)" strokeWidth="0.08" strokeDasharray="0.3 0.6">
+      <g stroke="url(#interstellar-line)" strokeWidth={highContrast ? "0.14" : "0.08"} strokeDasharray={highContrast ? "0.6 0.6" : "0.3 0.6"}>
         <line x1="20" y1="8" x2="46.5" y2="8.5" />
         <line x1="80" y1="9" x2="46.5" y2="8.5" />
         <line x1="24" y1="16.5" x2="46.5" y2="16.5" />
@@ -426,23 +428,27 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
         <line x1="76" y1="85" x2="46.5" y2="84.5" />
         <line x1="26" y1="93.5" x2="46.5" y2="93.5" />
         {/* Diagonal Cross Weave */}
-        <line x1="20" y1="8" x2="76" y2="17" strokeOpacity="0.06" />
-        <line x1="80" y1="9" x2="23" y2="25" strokeOpacity="0.06" />
-        <line x1="24" y1="16.5" x2="77" y2="34.5" strokeOpacity="0.06" />
-        <line x1="78" y1="25.5" x2="23" y2="48" strokeOpacity="0.06" />
-        <line x1="25" y1="34" x2="79" y2="62.5" strokeOpacity="0.06" />
-        <line x1="79" y1="48.5" x2="25" y2="74.5" strokeOpacity="0.06" />
-        <line x1="22" y1="62" x2="76" y2="85" strokeOpacity="0.06" />
-        <line x1="79" y1="62.5" x2="26" y2="93.5" strokeOpacity="0.06" />
+        <line x1="20" y1="8" x2="76" y2="17" strokeOpacity={highContrast ? "0.15" : "0.06"} />
+        <line x1="80" y1="9" x2="23" y2="25" strokeOpacity={highContrast ? "0.15" : "0.06"} />
+        <line x1="24" y1="16.5" x2="77" y2="34.5" strokeOpacity={highContrast ? "0.15" : "0.06"} />
+        <line x1="78" y1="25.5" x2="23" y2="48" strokeOpacity={highContrast ? "0.15" : "0.06"} />
+        <line x1="25" y1="34" x2="79" y2="62.5" strokeOpacity={highContrast ? "0.15" : "0.06"} />
+        <line x1="79" y1="48.5" x2="25" y2="74.5" strokeOpacity={highContrast ? "0.15" : "0.06"} />
+        <line x1="22" y1="62" x2="76" y2="85" strokeOpacity={highContrast ? "0.15" : "0.06"} />
+        <line x1="79" y1="62.5" x2="26" y2="93.5" strokeOpacity={highContrast ? "0.15" : "0.06"} />
       </g>
 
       {/* 2. ZODIAC CONSTELLATIONS */}
       {ZODIAC_CONSTELLATIONS.map((constellation) => {
         const isAssociated = constellation.associatedPlanetId.toLowerCase() === activePlanet;
-        const constOpacity = isAssociated ? 0.95 : opacity;
-        const strokeColor = isAssociated ? '#38bdf8' : 'rgba(148, 163, 184, 0.4)';
-        const starFillColor = isAssociated ? '#ffffff' : 'rgba(226, 232, 240, 0.6)';
-        const strokeWidth = isAssociated ? '0.22' : '0.12';
+        const constOpacity = highContrast ? (isAssociated ? 1 : 0.85) : (isAssociated ? 0.95 : opacity);
+        const strokeColor = isAssociated 
+          ? (highContrast ? '#38bdf8' : '#38bdf8') 
+          : (highContrast ? '#94a3b8' : 'rgba(148, 163, 184, 0.4)');
+        const starFillColor = isAssociated ? '#ffffff' : (highContrast ? '#ffffff' : 'rgba(226, 232, 240, 0.6)');
+        const strokeWidth = isAssociated 
+          ? (highContrast ? '0.34' : '0.22') 
+          : (highContrast ? '0.20' : '0.12');
 
         return (
           <g key={constellation.id} className="transition-all duration-500">
@@ -462,7 +468,7 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
                   stroke={strokeColor}
                   strokeWidth={strokeWidth}
                   strokeOpacity={constOpacity}
-                  strokeDasharray={isAssociated ? 'none' : '0.4 0.4'}
+                  strokeDasharray={isAssociated ? 'none' : (highContrast ? 'none' : '0.4 0.4')}
                   filter={isAssociated ? 'url(#active-star-glow)' : 'url(#star-glow)'}
                 />
               );
@@ -471,7 +477,9 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
             {/* Constellation Stars (Vertices) */}
             {constellation.stars.map((star, idx) => {
               const isMainStar = idx === 0 || idx === 1;
-              const radius = isAssociated ? star.size * 0.12 : star.size * 0.08;
+              const radius = isAssociated 
+                ? (highContrast ? star.size * 0.16 : star.size * 0.12) 
+                : (highContrast ? star.size * 0.12 : star.size * 0.08);
 
               return (
                 <g key={`${constellation.id}-star-${idx}`}>
@@ -480,9 +488,9 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
                     <circle
                       cx={star.x}
                       y={star.y}
-                      r={radius * 2.2}
+                      r={radius * (highContrast ? 2.5 : 2.2)}
                       fill={constellation.color}
-                      fillOpacity="0.3"
+                      fillOpacity={highContrast ? "0.5" : "0.3"}
                       className="animate-pulse"
                     />
                   )}
@@ -501,15 +509,30 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
             {showLabels && (
               <g 
                 className="transition-opacity duration-300 font-sans select-none"
-                style={{ opacity: isAssociated ? 1 : 0.45 }}
+                style={{ opacity: isAssociated ? 1 : (highContrast ? 0.95 : 0.45) }}
               >
+                {/* Background badge pill in high contrast mode for crisp legibility */}
+                {highContrast && (
+                  <rect
+                    x={constellation.labelPos.x < 50 ? constellation.labelPos.x - 11 : constellation.labelPos.x - 1.5}
+                    y={constellation.labelPos.y - 1.4}
+                    width="12.5"
+                    height="2.8"
+                    rx="0.6"
+                    fill="#000000"
+                    fillOpacity="0.85"
+                    stroke={isAssociated ? '#38bdf8' : '#64748b'}
+                    strokeWidth="0.12"
+                  />
+                )}
+
                 {/* Zodiac Glyph Symbol */}
                 <text
                   x={constellation.labelPos.x}
                   y={constellation.labelPos.y}
-                  fill={isAssociated ? '#38bdf8' : 'rgba(203, 213, 225, 0.7)'}
-                  fontSize={isAssociated ? '1.8' : '1.3'}
-                  fontWeight="bold"
+                  fill={isAssociated ? '#38bdf8' : (highContrast ? '#f8fafc' : 'rgba(203, 213, 225, 0.7)')}
+                  fontSize={isAssociated ? (highContrast ? '2.1' : '1.8') : (highContrast ? '1.6' : '1.3')}
+                  fontWeight={highContrast ? '900' : 'bold'}
                   textAnchor="middle"
                   dominantBaseline="central"
                 >
@@ -520,16 +543,16 @@ export const ZodiacConstellationOverlay: React.FC<ZodiacConstellationOverlayProp
                 <text
                   x={constellation.labelPos.x + (constellation.labelPos.x < 50 ? -2.2 : 2.2)}
                   y={constellation.labelPos.y}
-                  fill={isAssociated ? '#f1f5f9' : 'rgba(148, 163, 184, 0.6)'}
-                  fontSize="0.9"
-                  fontFamily="monospace"
-                  fontWeight={isAssociated ? 'bold' : 'normal'}
+                  fill={isAssociated ? '#ffffff' : (highContrast ? '#ffffff' : 'rgba(148, 163, 184, 0.6)')}
+                  fontSize={highContrast ? '1.05' : '0.9'}
+                  fontFamily="sans-serif"
+                  fontWeight={highContrast ? '800' : (isAssociated ? 'bold' : 'normal')}
                   textAnchor={constellation.labelPos.x < 50 ? 'end' : 'start'}
                   dominantBaseline="central"
                 >
                   {constellation.name}
                   {isAssociated && (
-                    <tspan dx="0.5" fill="#38bdf8" fontSize="0.75">
+                    <tspan dx="0.5" fill={highContrast ? '#67e8f9' : '#38bdf8'} fontSize={highContrast ? '0.85' : '0.75'} fontWeight="800">
                       [{constellation.sanskrit.split(' ')[0]}]
                     </tspan>
                   )}

@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CelestialBodyData } from '../../types';
+import { CelestialBodyData, UserProfile } from '../../types';
 import { cosmicAudio } from '../../utils/audioSynthesizer';
+import { drawHighFidelityPlanet } from '../../utils/highQualityPlanetRenderer';
+import { VedicCompatibilitySection } from './VedicCompatibilitySection';
+import { calculateVedicPlanetCompatibility } from '../../utils/vedicCompatibilityEngine';
 import {
   ChevronDown,
   ChevronUp,
@@ -21,26 +24,37 @@ import {
   Globe,
   Share2,
   BookOpen,
+  HeartHandshake,
+  User,
 } from 'lucide-react';
 
 interface DeepPortalViewerProps {
   body: CelestialBodyData;
   allBodies: CelestialBodyData[];
+  user?: UserProfile;
+  initialDepth?: PortalDepth;
   onClose: () => void;
   onTravelTo: (targetBody: CelestialBodyData) => void;
 }
 
-type PortalDepth = 1 | 2 | 3 | 4;
+export type PortalDepth = 1 | 2 | 3 | 4 | 5;
 
 export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
   body,
   allBodies,
+  user,
+  initialDepth = 1,
   onClose,
   onTravelTo,
 }) => {
-  const [currentDepth, setCurrentDepth] = useState<PortalDepth>(1);
+  const [currentDepth, setCurrentDepth] = useState<PortalDepth>(initialDepth);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Calculate quick compatibility summary for header badge
+  const quickCompatibility = useMemo(() => {
+    return calculateVedicPlanetCompatibility(body, user);
+  }, [body, user]);
 
   // Play planetary frequency tone
   const toggleAudio = () => {
@@ -62,11 +76,13 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
   const changeDepth = (newDepth: PortalDepth) => {
     if (newDepth === currentDepth) return;
     setIsTransitioning(true);
-    cosmicAudio.play369Chime(body.teslaHarmonicNumber === 3 ? 396 : body.teslaHarmonicNumber === 6 ? 639 : 963);
+    cosmicAudio.play369Chime(
+      newDepth === 5 ? 528 : body.teslaHarmonicNumber === 3 ? 396 : body.teslaHarmonicNumber === 6 ? 639 : 963
+    );
     setTimeout(() => {
       setCurrentDepth(newDepth);
       setIsTransitioning(false);
-    }, 400);
+    }, 300);
   };
 
   const depthNames = [
@@ -74,6 +90,7 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
     { depth: 2, title: 'Surface & Atmosphere', subtitle: 'Atmospheric Abyss & Torus' },
     { depth: 3, title: 'Vedic Graha Temple', subtitle: 'Jyotish Sacred Mandala' },
     { depth: 4, title: 'Tesla 3-6-9 Vortex', subtitle: 'Quantum Singularity Core' },
+    { depth: 5, title: 'Vedic Compatibility', subtitle: 'Birth Chart & Transit Sync' },
   ];
 
   return (
@@ -96,7 +113,7 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
             {body.teslaHarmonicNumber}
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-xl sm:text-2xl font-cinzel font-bold text-[#fdf2d1] tracking-wider">
                 {body.name}
               </h2>
@@ -113,7 +130,21 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
         </div>
 
         {/* Action Controls & Close */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Quick Vedic Compatibility Header Jump Button */}
+          <button
+            onClick={() => changeDepth(5)}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+              currentDepth === 5
+                ? 'bg-gradient-to-r from-amber-500/40 to-emerald-500/40 border-amber-400 text-amber-200 shadow-[0_0_15px_rgba(251,191,36,0.4)]'
+                : 'bg-black/60 hover:bg-emerald-950/40 border-emerald-500/40 text-emerald-300 hover:text-emerald-200'
+            }`}
+            title="Open Live Vedic Compatibility with User Birth Data"
+          >
+            <HeartHandshake className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Vedic Sync: <strong>{quickCompatibility.overallCompatibilityScore}%</strong></span>
+          </button>
+
           <button
             onClick={toggleAudio}
             className={`px-3 py-1.5 rounded-xl border text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
@@ -143,7 +174,7 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
             <button
               key={item.depth}
               onClick={() => changeDepth(item.depth as PortalDepth)}
-              className={`flex-1 min-w-[120px] sm:min-w-[150px] p-2 sm:p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+              className={`flex-1 min-w-[120px] sm:min-w-[140px] p-2 sm:p-2.5 rounded-xl text-left transition-all cursor-pointer flex items-center gap-2.5 ${
                 currentDepth === item.depth
                   ? 'bg-gradient-to-r from-amber-500/30 to-purple-500/30 border border-amber-400 shadow-[0_0_15px_rgba(255,215,0,0.4)]'
                   : 'hover:bg-white/5 border border-transparent text-gray-400'
@@ -186,25 +217,11 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
             >
               {/* Visual 3D Sphere & Planetary Glow Display */}
               <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 rounded-3xl bg-black/60 border border-amber-500/30 shadow-2xl relative overflow-hidden">
-                <div
-                  className="w-48 h-48 sm:w-60 sm:h-60 rounded-full flex items-center justify-center relative shadow-[0_0_80px_rgba(255,215,0,0.5)] animate-pulse"
-                  style={{
-                    background: `radial-gradient(circle at 35% 35%, ${body.color}, ${body.glowColor}, #05020c)`,
-                  }}
-                >
-                  {/* Planetary Detail Texture Overlay */}
-                  {body.id === 'saturn' && (
-                    <div className="absolute inset-0 w-[140%] h-[30%] -left-[20%] top-[35%] rounded-full border-[10px] border-amber-200/60 rotate-12 pointer-events-none" />
-                  )}
-                  {body.id === 'sun' && (
-                    <div className="absolute inset-0 rounded-full border-4 border-amber-300/60 animate-spin-slow" />
-                  )}
-                  <div className="text-center font-cinzel font-black text-3xl sm:text-4xl text-black/90 drop-shadow-md">
-                    {body.teslaHarmonicNumber}
-                  </div>
+                <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center relative">
+                  <RotatingPlanetPreview body={body} />
                 </div>
 
-                <div className="mt-4 text-center">
+                <div className="mt-2 text-center">
                   <span className="text-xs font-mono text-amber-300/80 uppercase tracking-widest block">
                     HARMONIC MATRIX #{body.teslaHarmonicNumber}
                   </span>
@@ -229,6 +246,25 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
                       <span className="text-xs sm:text-sm font-bold text-amber-200 font-cinzel">{fact.value}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* Quick Vedic Compatibility Banner in Orbit */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/40 to-cyan-950/40 border border-emerald-500/30 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-300">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{user?.name || 'Anya Sharma'}'s Vedic Compatibility:</span>
+                      <span className="text-amber-300 font-mono">{quickCompatibility.overallCompatibilityScore}% ({quickCompatibility.grade})</span>
+                    </div>
+                    <span className="text-[11px] text-gray-400 block">{quickCompatibility.verdictTitle}</span>
+                  </div>
+                  <button
+                    onClick={() => changeDepth(5)}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-xs font-mono font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>View Sync</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-between">
@@ -377,6 +413,24 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
                   <p className="text-xs text-gray-300">{body.vedicGraha}</p>
                 </div>
 
+                {/* Direct Link to Vedic Compatibility (Depth 5) */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-cyan-500/20 border border-amber-400/40 flex items-center justify-between">
+                  <div className="text-xs">
+                    <span className="text-amber-200 font-bold block flex items-center gap-1.5">
+                      <HeartHandshake className="w-3.5 h-3.5 text-amber-300" />
+                      Dynamic Vedic Compatibility ({user?.name || 'Anya Sharma'})
+                    </span>
+                    <span className="text-gray-300 text-[11px]">Calculate exact Gochara transit & personal birth chart alignment</span>
+                  </div>
+                  <button
+                    onClick={() => changeDepth(5)}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-cinzel font-bold text-xs flex items-center gap-1 shadow-lg transition-all cursor-pointer"
+                  >
+                    <span>Open Sync (Depth 5)</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
                 <div className="flex items-center justify-between pt-2">
                   <button
                     onClick={() => changeDepth(2)}
@@ -461,14 +515,32 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
                   </button>
 
                   <button
-                    onClick={() => changeDepth(1)}
-                    className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-cinzel font-bold text-xs flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
+                    onClick={() => changeDepth(5)}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-black font-cinzel font-bold text-xs flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
                   >
-                    <span>Return to Orbit</span>
-                    <ChevronUp className="w-4 h-4" />
+                    <span>Vedic Compatibility Matrix</span>
+                    <ChevronDown className="w-4 h-4" />
                   </button>
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {/* LEVEL 5: VEDIC COMPATIBILITY & BIRTH CHART SYNCHRONIZATION */}
+          {currentDepth === 5 && (
+            <motion.div
+              key="depth-5"
+              initial={{ opacity: 0, scale: 0.94, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 1.06, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="w-full"
+            >
+              <VedicCompatibilitySection
+                body={body}
+                user={user}
+                onJumpToTemple={() => changeDepth(3)}
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -500,3 +572,57 @@ export const DeepPortalViewer: React.FC<DeepPortalViewerProps> = ({
     </div>
   );
 };
+
+const RotatingPlanetPreview: React.FC<{ body: CelestialBodyData }> = ({ body }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let frame = 0;
+
+    const render = () => {
+      frame++;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const radius = Math.min(cx, cy) * 0.52;
+
+      drawHighFidelityPlanet({
+        ctx,
+        body,
+        screenX: cx,
+        screenY: cy,
+        bodyRadius: radius,
+        frame,
+        isSelected: true,
+        isHovered: false,
+      });
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animId);
+    };
+  }, [body]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={280}
+      height={280}
+      className="w-full h-full block filter drop-shadow-[0_0_40px_rgba(255,215,0,0.3)]"
+    />
+  );
+};
+

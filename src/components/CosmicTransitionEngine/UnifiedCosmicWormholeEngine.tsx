@@ -24,6 +24,15 @@ export const SCREEN_COSMIC_MAP: Record<ScreenType, ScreenCosmicMetadata> = {
     grahaLord: 'Surya (The Primordial Sun)',
     mantra: 'ॐ भूर्भुवः स्वः तत्सवितुर्वरेण्यम्',
   },
+  'energy-balance': {
+    title: 'Choose Your Energy & Lotus Balance Sanctuary',
+    sanskrit: 'ऊर्जा सन्तुलन एवं कमल तुला (Urja Santulan)',
+    frequency: 528,
+    mode: 'nebula',
+    color: '#fbbf24',
+    grahaLord: 'Suryanarayana & Chandra (Solar & Lunar Equilibrium)',
+    mantra: 'ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः',
+  },
   portal: {
     title: 'Institute Student & Seeker Portal',
     sanskrit: 'विद्यापीठ चेतना (Vidyapeeth)',
@@ -159,6 +168,33 @@ export const SCREEN_COSMIC_MAP: Record<ScreenType, ScreenCosmicMetadata> = {
     grahaLord: 'Shiva Mahadeva (Lord of Meditation & Cosmic Sound)',
     mantra: 'ॐ नमः शिवाय',
   },
+  'mind-healing': {
+    title: 'Mind-Over-Illness: Cellular Self-Healing Matrix',
+    sanskrit: 'चित्त रोग मुक्ति एवं कायाकल्प (Chitta Rog Mukti)',
+    frequency: 528,
+    mode: 'wormhole',
+    color: '#10b981',
+    grahaLord: 'Lord Dhanvantari (Divine Physician of the Cosmos)',
+    mantra: 'ॐ नमो भगवते धन्वन्तरये अमृतकलशहस्ताय सर्वभयविनाशाय सर्वरोगनिवारणाय नमः',
+  },
+  'sound-healing': {
+    title: 'Buddhist & Sacred Sound Healing Therapy Suite',
+    sanskrit: 'नाद ब्रह्म एवं तिब्बती कटोरा चिकित्सा (Nada Brahma)',
+    frequency: 432,
+    mode: 'stardust',
+    color: '#f59e0b',
+    grahaLord: 'Bhaisajyaguru (Medicine Buddha & Seven Vajra Metals)',
+    mantra: 'तद्यथा ॐ भैषज्ये भैषज्ये महाभैषज्ये राजसमुद्गते स्वाहा',
+  },
+  'memory-hypnosis': {
+    title: 'Memory Healing Hypnosis & Cognitive Reconsolidation',
+    sanskrit: 'स्मृति उपचार सम्मोहन एवं संस्कार विच्छेदन (Smriti Hypnosis)',
+    frequency: 528,
+    mode: 'singularity',
+    color: '#06b6d4',
+    grahaLord: 'Maha Saraswati & Medha Shakti (Neural Lightning)',
+    mantra: 'ॐ ऐं सरस्वत्यै नमः • ॐ मेधा देव्यै स्वाहा',
+  },
   karma: {
     title: 'Karmic Balance Sheet & Dharmic Ledger',
     sanskrit: 'कर्म फल दर्पण एवं पाप-पुण्य लेखा (Karma Mandala)',
@@ -247,15 +283,24 @@ export const UnifiedCosmicWormholeEngine: React.FC<UnifiedCosmicWormholeEnginePr
   useEffect(() => {
     if (!isNavigating) return;
 
+    // Safety timeout: Guarantee completion within 700ms under all conditions
+    const safetyTimer = setTimeout(() => {
+      onTransitionComplete();
+    }, 700);
+
     // Play resonant Solfeggio or Cosmic Tone corresponding to destination
     try {
-      cosmicAudio.playTeslaFrequency(meta.frequency, 1.6);
+      cosmicAudio.playTeslaFrequency(meta.frequency, 1.2);
     } catch {}
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return () => clearTimeout(safetyTimer);
+    }
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return () => clearTimeout(safetyTimer);
+    }
 
     let animId: number;
     let width = (canvas.width = window.innerWidth);
@@ -431,6 +476,7 @@ export const UnifiedCosmicWormholeEngine: React.FC<UnifiedCosmicWormholeEnginePr
     animId = requestAnimationFrame(render);
 
     return () => {
+      clearTimeout(safetyTimer);
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
     };

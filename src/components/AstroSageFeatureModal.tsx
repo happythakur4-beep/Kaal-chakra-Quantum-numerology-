@@ -137,11 +137,13 @@ export const AstroSageFeatureModal: React.FC<AstroSageFeatureModalProps> = ({
           {/* Sub-Features Grid / List */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-cinzel font-bold text-[#d4af37] uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <h4 className={`text-xs font-cinzel font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+                isDark ? 'text-[#d4af37]' : 'text-[#92400e]'
+              }`}>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 Available Vedic Sub-Features & Calculators ({subFeatures.length})
               </h4>
-              <span className="text-[10px] font-mono text-gray-400">Click to Open Tool</span>
+              <span className={`text-[10px] font-mono ${isDark ? 'text-gray-400' : 'text-[#78350f] font-semibold'}`}>Click to Open Tool</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -152,27 +154,35 @@ export const AstroSageFeatureModal: React.FC<AstroSageFeatureModalProps> = ({
                   className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all duration-300 cursor-pointer group hover:-translate-y-1 shadow-sm ${
                     isDark 
                       ? 'bg-black/50 border-[#d4af37]/25 hover:border-[#ffd700] hover:bg-[#d4af37]/10' 
-                      : 'bg-white border-amber-200/80 hover:border-[#8a6514] hover:bg-amber-50'
+                      : 'bg-white border-amber-200/80 hover:border-[#8a6514] hover:bg-amber-50 shadow-md'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <h5 className="text-xs font-cinzel font-bold text-[#fdf2d1] group-hover:text-[#ffd700] flex items-center gap-1.5">
-                        <span className="text-[#d4af37]">✦</span>
+                      <h5 className={`text-xs font-cinzel font-bold flex items-center gap-1.5 transition-colors ${
+                        isDark ? 'text-[#fdf2d1] group-hover:text-[#ffd700]' : 'text-[#2a1704] group-hover:text-[#92400e]'
+                      }`}>
+                        <span className={isDark ? 'text-[#d4af37]' : 'text-amber-600'}>✦</span>
                         <span>{sub.title}</span>
                       </h5>
                       {sub.badge && (
-                        <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border ${
+                          isDark ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-amber-100 text-[#78350f] border-amber-300'
+                        }`}>
                           {sub.badge}
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] font-serif text-gray-400 group-hover:text-gray-300 line-clamp-2">
+                    <p className={`text-[11px] font-serif line-clamp-2 ${
+                      isDark ? 'text-gray-400 group-hover:text-gray-300' : 'text-[#5c4728] font-medium'
+                    }`}>
                       {sub.description}
                     </p>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] font-cinzel font-bold text-amber-400 group-hover:text-[#ffd700]">
+                  <div className={`mt-3 pt-2 border-t flex items-center justify-between text-[10px] font-cinzel font-bold transition-colors ${
+                    isDark ? 'border-white/5 text-amber-400 group-hover:text-[#ffd700]' : 'border-amber-200 text-[#92400e] group-hover:text-amber-900'
+                  }`}>
                     <span>Launch Sub-Engine</span>
                     <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -182,7 +192,7 @@ export const AstroSageFeatureModal: React.FC<AstroSageFeatureModalProps> = ({
           </div>
 
           {/* Quick Action Footer inside Modal */}
-          <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#d4af37]/20">
+          <div className={`pt-2 flex flex-wrap items-center justify-between gap-3 border-t ${isDark ? 'border-[#d4af37]/20' : 'border-[#c5a059]/40'}`}>
             <button
               onClick={() => {
                 onOpenAstrologerChat();
@@ -196,7 +206,9 @@ export const AstroSageFeatureModal: React.FC<AstroSageFeatureModalProps> = ({
 
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-[#d4af37]/40 text-amber-200 hover:bg-[#d4af37]/10 font-cinzel text-xs cursor-pointer"
+              className={`px-4 py-2 rounded-lg border font-cinzel text-xs cursor-pointer font-bold ${
+                isDark ? 'border-[#d4af37]/40 text-amber-200 hover:bg-[#d4af37]/10' : 'border-amber-400/80 bg-white text-[#78350f] hover:bg-amber-50 shadow-sm'
+              }`}
             >
               Close Window
             </button>

@@ -1,6 +1,6 @@
 {
   "name": "Kaal Chakra - Quantum Numerology",
-  "description": "The complete Occult Science & Vedic Astrology Platform featuring the Karma Ledger (Punya, Sins & Atonement Matrix), 369 Tesla Portal (celestial orrery, planets, galaxies, black hole warp, vortex math), Aaj Ka Panchang, Janam Kundli, Kundli Milan, Lal Kitab Teva, KP Krishnamurti Paddhati, Grah Gochar, Dainik Rashifal, Ratna Upay, and AI Daivajna Guru.",
-  "requestFramePermissions": [],
+  "description": "The complete Occult Science & Vedic Astrology Platform with Memory Healing Hypnosis (3D Synaptic Brain, Lightning Reconsolidation & Roman Memory Palace), Buddhist Sound Healing Therapy Suite (7 Tibetan Planetary Bowls, Medicine Buddha Mantras, Solfeggio Scale & Binaural Beats), Mind-Over-Illness Cellular Healing Matrix, Android PWA/APK integration, Social Sharing, Karma Ledger, 369 Tesla Portal, Aaj Ka Panchang, Janam Kundli, Kundli Milan, Lal Kitab Teva, KP Horary, Grah Gochar, Dainik Rashifal, Ratna Upay, and AI Daivajna Guru.",
+  "requestFramePermissions": ["geolocation", "autoplay"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

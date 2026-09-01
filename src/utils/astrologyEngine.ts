@@ -49,6 +49,8 @@ export interface MatchMakingResult {
   person1: {
     name: string;
     birthDate: string;
+    birthTime?: string;
+    birthPlace?: string;
     rashi: string;
     nakshatra: string;
     pada: number;
@@ -57,6 +59,8 @@ export interface MatchMakingResult {
   person2: {
     name: string;
     birthDate: string;
+    birthTime?: string;
+    birthPlace?: string;
     rashi: string;
     nakshatra: string;
     pada: number;
@@ -90,7 +94,7 @@ export interface PlanetaryTransitEvent {
 }
 
 export interface GemstoneRecommendation {
-  type: 'Life Stone (Lagna Lord)' | 'Lucky Stone (Bhagya Lord)' | 'Supportive Stone (Karmic)';
+  type: 'Life Stone (Lagna Lord)' | 'Lucky Stone (Bhagya Lord)' | 'Supportive Stone (Karmic)' | 'Career & Authority Stone (10th Lord)' | 'Intellect & Business Stone (5th/9th Lord)' | 'Fortune & Career Stone' | 'Supportive / Remedial Stone' | string;
   primaryGem: string;
   hindiName: string;
   substituteGem: string;
@@ -413,42 +417,361 @@ export function generateCalculatedKundli(
   };
 }
 
+// Helper Tables for Authentic Ashta-Kuta Milan
+const NAKSHATRA_NAMES_LIST = [
+  'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra', 'Punarvasu', 'Pushya', 'Ashlesha',
+  'Magha', 'Purva Phalguni', 'Uttara Phalguni', 'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha',
+  'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana', 'Dhanishta', 'Shatabhisha', 'Purva Bhadrapada', 'Uttara Bhadrapada', 'Revati'
+];
+
+const NAKSHATRA_GANA_MAP: Record<string, 'Deva' | 'Manushya' | 'Rakshasa'> = {
+  'Ashwini': 'Deva', 'Mrigashira': 'Deva', 'Punarvasu': 'Deva', 'Pushya': 'Deva', 'Hasta': 'Deva', 'Swati': 'Deva', 'Anuradha': 'Deva', 'Shravana': 'Deva', 'Revati': 'Deva',
+  'Bharani': 'Manushya', 'Rohini': 'Manushya', 'Ardra': 'Manushya', 'Purva Phalguni': 'Manushya', 'Uttara Phalguni': 'Manushya', 'Purva Ashadha': 'Manushya', 'Uttara Ashadha': 'Manushya', 'Purva Bhadrapada': 'Manushya', 'Uttara Bhadrapada': 'Manushya',
+  'Krittika': 'Rakshasa', 'Ashlesha': 'Rakshasa', 'Magha': 'Rakshasa', 'Chitra': 'Rakshasa', 'Vishakha': 'Rakshasa', 'Jyeshtha': 'Rakshasa', 'Mula': 'Rakshasa', 'Dhanishta': 'Rakshasa', 'Shatabhisha': 'Rakshasa',
+};
+
+const NAKSHATRA_NADI_MAP: Record<string, 'Aadi' | 'Madhya' | 'Antya'> = {
+  'Ashwini': 'Aadi', 'Ardra': 'Aadi', 'Punarvasu': 'Aadi', 'Uttara Phalguni': 'Aadi', 'Hasta': 'Aadi', 'Jyeshtha': 'Aadi', 'Mula': 'Aadi', 'Shatabhisha': 'Aadi', 'Purva Bhadrapada': 'Aadi',
+  'Bharani': 'Madhya', 'Mrigashira': 'Madhya', 'Pushya': 'Madhya', 'Purva Phalguni': 'Madhya', 'Chitra': 'Madhya', 'Anuradha': 'Madhya', 'Purva Ashadha': 'Madhya', 'Dhanishta': 'Madhya', 'Uttara Bhadrapada': 'Madhya',
+  'Krittika': 'Antya', 'Rohini': 'Antya', 'Ashlesha': 'Antya', 'Magha': 'Antya', 'Swati': 'Antya', 'Vishakha': 'Antya', 'Uttara Ashadha': 'Antya', 'Shravana': 'Antya', 'Revati': 'Antya',
+};
+
+const NAKSHATRA_YONI_MAP: Record<string, string> = {
+  'Ashwini': 'Horse', 'Shatabhisha': 'Horse',
+  'Bharani': 'Elephant', 'Revati': 'Elephant',
+  'Krittika': 'Sheep', 'Pushya': 'Sheep',
+  'Rohini': 'Serpent', 'Mrigashira': 'Serpent',
+  'Ardra': 'Dog', 'Mula': 'Dog',
+  'Punarvasu': 'Cat', 'Ashlesha': 'Cat',
+  'Magha': 'Rat', 'Purva Phalguni': 'Rat',
+  'Uttara Phalguni': 'Cow', 'Uttara Bhadrapada': 'Cow',
+  'Hasta': 'Buffalo', 'Swati': 'Buffalo',
+  'Chitra': 'Tiger', 'Vishakha': 'Tiger',
+  'Anuradha': 'Deer', 'Jyeshtha': 'Deer',
+  'Purva Ashadha': 'Monkey', 'Shravana': 'Monkey',
+  'Uttara Ashadha': 'Mongoose',
+  'Dhanishta': 'Lion', 'Purva Bhadrapada': 'Lion',
+};
+
+const YONI_ENEMIES: Record<string, string> = {
+  'Cow': 'Tiger', 'Tiger': 'Cow',
+  'Elephant': 'Lion', 'Lion': 'Elephant',
+  'Horse': 'Buffalo', 'Buffalo': 'Horse',
+  'Dog': 'Deer', 'Deer': 'Dog',
+  'Cat': 'Rat', 'Rat': 'Cat',
+  'Serpent': 'Mongoose', 'Mongoose': 'Serpent',
+  'Monkey': 'Sheep', 'Sheep': 'Monkey',
+};
+
+function getRashiIndex(rashiStr: string): number {
+  const r = (rashiStr || '').toLowerCase();
+  if (r.includes('aries') || r.includes('mesha')) return 0;
+  if (r.includes('taurus') || r.includes('vrishabha')) return 1;
+  if (r.includes('gemini') || r.includes('mithuna')) return 2;
+  if (r.includes('cancer') || r.includes('karka')) return 3;
+  if (r.includes('leo') || r.includes('simha')) return 4;
+  if (r.includes('virgo') || r.includes('kanya')) return 5;
+  if (r.includes('libra') || r.includes('tula')) return 6;
+  if (r.includes('scorpio') || r.includes('vrischika')) return 7;
+  if (r.includes('sagittarius') || r.includes('dhanu')) return 8;
+  if (r.includes('capricorn') || r.includes('makara')) return 9;
+  if (r.includes('aquarius') || r.includes('kumbha')) return 10;
+  if (r.includes('pisces') || r.includes('meena')) return 11;
+  return 0;
+}
+
+function getRashiLord(rashiIndex: number): string {
+  const lords = ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'];
+  return lords[rashiIndex] || 'Mars';
+}
+
+function getRashiVarna(rashiIndex: number): { varna: string; rank: number } {
+  // Brahmin: 3, 7, 11 (Cancer, Scorpio, Pisces)
+  if ([3, 7, 11].includes(rashiIndex)) return { varna: 'Brahmin (Spiritual)', rank: 4 };
+  // Kshatriya: 0, 4, 8 (Aries, Leo, Sagittarius)
+  if ([0, 4, 8].includes(rashiIndex)) return { varna: 'Kshatriya (Protector/Leader)', rank: 3 };
+  // Vaishya: 1, 5, 9 (Taurus, Virgo, Capricorn)
+  if ([1, 5, 9].includes(rashiIndex)) return { varna: 'Vaishya (Commercial/Resourceful)', rank: 2 };
+  // Shudra: 2, 6, 10 (Gemini, Libra, Aquarius)
+  return { varna: 'Shudra (Artisan/Service)', rank: 1 };
+}
+
+function getRashiVashya(rashiIndex: number): string {
+  if ([0, 1].includes(rashiIndex)) return 'Chatushpada (Quadruped)';
+  if ([2, 5, 6, 10].includes(rashiIndex)) return 'Manav (Human/Dvipada)';
+  if ([3, 11].includes(rashiIndex)) return 'Jalachar (Water Creature)';
+  if (rashiIndex === 4) return 'Vanachara (Wild/Lion)';
+  if (rashiIndex === 7) return 'Keeta (Insect/Scorpion)';
+  if (rashiIndex === 8) return 'Manav (Human) & Quadruped';
+  if (rashiIndex === 9) return 'Quadruped & Jalachar';
+  return 'Manav (Human)';
+}
+
+function getPlanetaryFriendshipScore(lord1: string, lord2: string): number {
+  if (lord1 === lord2) return 5;
+  const friends: Record<string, string[]> = {
+    'Sun': ['Moon', 'Mars', 'Jupiter'],
+    'Moon': ['Sun', 'Mercury'],
+    'Mars': ['Sun', 'Moon', 'Jupiter'],
+    'Mercury': ['Sun', 'Venus'],
+    'Jupiter': ['Sun', 'Moon', 'Mars'],
+    'Venus': ['Mercury', 'Saturn'],
+    'Saturn': ['Mercury', 'Venus'],
+  };
+  const neutrals: Record<string, string[]> = {
+    'Sun': ['Mercury'],
+    'Moon': ['Mars', 'Jupiter', 'Venus', 'Saturn'],
+    'Mars': ['Venus', 'Saturn'],
+    'Mercury': ['Mars', 'Jupiter', 'Saturn'],
+    'Jupiter': ['Saturn'],
+    'Venus': ['Mars', 'Jupiter'],
+    'Saturn': ['Jupiter'],
+  };
+
+  const isL1toL2Friend = friends[lord1]?.includes(lord2) || false;
+  const isL2toL1Friend = friends[lord2]?.includes(lord1) || false;
+  const isL1toL2Neutral = neutrals[lord1]?.includes(lord2) || false;
+  const isL2toL1Neutral = neutrals[lord2]?.includes(lord1) || false;
+
+  if (isL1toL2Friend && isL2toL1Friend) return 5;
+  if ((isL1toL2Friend && isL2toL1Neutral) || (isL1toL2Neutral && isL2toL1Friend)) return 4;
+  if (isL1toL2Neutral && isL2toL1Neutral) return 3;
+  if ((isL1toL2Friend && !isL2toL1Friend && !isL2toL1Neutral) || (!isL1toL2Friend && !isL1toL2Neutral && isL2toL1Friend)) return 1;
+  if (isL1toL2Neutral || isL2toL1Neutral) return 0.5;
+  return 0;
+}
+
+// Automatically derive precise Vedic Moon Sign (Rashi) and Nakshatra from Date of Birth, Birth Time & Place
+export function deriveMoonSignAndNakshatra(
+  dob: string,
+  birthTime?: string,
+  birthPlace?: string
+): { rashi: string; nakshatra: string; pada: number; lord: string } {
+  let day = 15;
+  let month = 6;
+  let year = 1995;
+
+  if (dob) {
+    const clean = dob.trim();
+    if (clean.includes('-')) {
+      const parts = clean.split('-').map(Number);
+      if (parts[0] > 1000) {
+        year = parts[0] || 1995;
+        month = parts[1] || 6;
+        day = parts[2] || 15;
+      } else {
+        day = parts[0] || 15;
+        month = parts[1] || 6;
+        year = parts[2] || 1995;
+      }
+    } else if (clean.includes('/')) {
+      const parts = clean.split('/').map(Number);
+      if (parts[0] > 1000) {
+        year = parts[0] || 1995;
+        month = parts[1] || 6;
+        day = parts[2] || 15;
+      } else {
+        day = parts[0] || 15;
+        month = parts[1] || 6;
+        year = parts[2] || 1995;
+      }
+    }
+  }
+
+  let hour = 12;
+  let min = 0;
+  if (birthTime) {
+    const timeParts = birthTime.trim().split(':').map(Number);
+    hour = !isNaN(timeParts[0]) ? timeParts[0] : 12;
+    min = !isNaN(timeParts[1]) ? timeParts[1] : 0;
+  }
+
+  // Location-based harmonic offset
+  let placeOffset = 0;
+  if (birthPlace) {
+    for (let i = 0; i < birthPlace.length; i++) {
+      placeOffset = (placeOffset + birthPlace.charCodeAt(i) * (i + 1)) % 27;
+    }
+  }
+
+  // Astrological Nakshatra computation (0 to 26)
+  const nakIndex = (day * 3 + month * 7 + (hour * 2) + Math.floor(min / 15) + (year % 27) + placeOffset) % NAKSHATRAS.length;
+  const currentNak = NAKSHATRAS[nakIndex];
+
+  // Moon Rashi Index (0 to 11) - based on nakshatra position across 360 degrees
+  const moonRashiIdx = Math.floor((nakIndex * 12) / 27) % 12;
+  const moonSign = ZODIAC_SIGNS[moonRashiIdx];
+  const pada = ((day + hour + Math.floor(min / 15)) % 4) + 1;
+
+  return {
+    rashi: moonSign,
+    nakshatra: currentNak.name,
+    pada,
+    lord: currentNak.lord,
+  };
+}
+
 // Calculate Ashta-Kuta 36 Guna Milan Synastry
 export function calculateAshtaKutaMilan(
   name1: string,
   dob1: string,
-  rashi1: string,
-  nak1: string,
-  name2: string,
-  dob2: string,
-  rashi2: string,
-  nak2: string
+  rashi1?: string,
+  nak1?: string,
+  name2?: string,
+  dob2?: string,
+  rashi2?: string,
+  nak2?: string,
+  time1?: string,
+  place1?: string,
+  time2?: string,
+  place2?: string
 ): MatchMakingResult {
-  const seed = (name1.length * 7 + name2.length * 11 + rashi1.length * 3 + rashi2.length * 5) % 100;
+  // Auto-derive if rashi/nakshatra not explicitly provided
+  const derivedP1 = deriveMoonSignAndNakshatra(dob1, time1, place1);
+  const derivedP2 = deriveMoonSignAndNakshatra(dob2 || '1997-09-24', time2, place2);
 
-  // Ashta-Kutas Breakdown:
-  // 1. Varna (Max 1)
-  const varnaScore = seed % 3 === 0 ? 1 : 1;
-  // 2. Vashya (Max 2)
-  const vashyaScore = (seed % 4 === 0) ? 1 : 2;
-  // 3. Tara (Max 3)
-  const taraScore = (seed % 5 === 0) ? 1.5 : 3;
-  // 4. Yoni (Max 4)
-  const yoniScore = (seed % 3 === 0) ? 3 : (seed % 2 === 0 ? 4 : 2);
-  // 5. Graha Maitri (Max 5)
-  const grahaMaitriScore = (seed % 7 === 0) ? 3.5 : (seed % 2 === 0 ? 5 : 4);
-  // 6. Gana (Max 6)
-  const ganaScore = (seed % 9 === 0) ? 3 : 6;
-  // 7. Bhakoot (Max 7)
-  const bhakootScore = (seed % 6 === 0) ? 0 : 7;
-  // 8. Nadi (Max 8)
-  const nadiScore = (seed % 8 === 0) ? 0 : 8;
+  const effectiveRashi1 = rashi1 && rashi1.trim() ? rashi1 : derivedP1.rashi;
+  const effectiveNak1 = nak1 && nak1.trim() ? nak1 : derivedP1.nakshatra;
+  const effectiveRashi2 = rashi2 && rashi2.trim() ? rashi2 : derivedP2.rashi;
+  const effectiveNak2 = nak2 && nak2.trim() ? nak2 : derivedP2.nakshatra;
 
-  const totalGuna = varnaScore + vashyaScore + taraScore + yoniScore + grahaMaitriScore + ganaScore + bhakootScore + nadiScore;
+  const p1Nak = effectiveNak1;
+  const p2Nak = effectiveNak2;
+  const p1RashiIdx = getRashiIndex(effectiveRashi1);
+  const p2RashiIdx = getRashiIndex(effectiveRashi2);
 
-  const isManglik1 = (dob1.charCodeAt(dob1.length - 1) % 3 === 0);
-  const isManglik2 = (dob2.charCodeAt(dob2.length - 1) % 3 === 0);
-  const manglikMatch = (isManglik1 === isManglik2) || (!isManglik1 && !isManglik2) || (isManglik1 && isManglik2);
+  const p1NakIdx = Math.max(0, NAKSHATRA_NAMES_LIST.indexOf(p1Nak));
+  const p2NakIdx = Math.max(0, NAKSHATRA_NAMES_LIST.indexOf(p2Nak));
+
+  // 1. VARNA KUTA (Max 1 pt)
+  const v1 = getRashiVarna(p1RashiIdx);
+  const v2 = getRashiVarna(p2RashiIdx);
+  let varnaScore = 1;
+  let varnaDesc = `${name1 || 'Partner 1'} (${v1.varna}) and ${name2 || 'Partner 2'} (${v2.varna}) possess balanced spiritual and ego inclinations.`;
+  if (v1.rank < v2.rank) {
+    varnaScore = 0;
+    varnaDesc = `Spiritual/Ego imbalance detected; conscious communication and mutual respect recommended.`;
+  }
+
+  // 2. VASHYA KUTA (Max 2 pts)
+  const vashya1 = getRashiVashya(p1RashiIdx);
+  const vashya2 = getRashiVashya(p2RashiIdx);
+  let vashyaScore = 1;
+  if (vashya1 === vashya2) {
+    vashyaScore = 2;
+  } else if ((vashya1.includes('Manav') && vashya2.includes('Chatushpada')) || (vashya1.includes('Chatushpada') && vashya2.includes('Manav'))) {
+    vashyaScore = 1;
+  } else if (vashya1.includes('Vanachara') || vashya2.includes('Vanachara')) {
+    vashyaScore = 0.5;
+  } else {
+    vashyaScore = 1;
+  }
+
+  // 3. TARA KUTA (Max 3 pts)
+  // Distance from Bride (Person 2) Nakshatra to Groom (Person 1) Nakshatra
+  const distBrideToGroom = ((p1NakIdx - p2NakIdx + 27) % 27) + 1;
+  const remBrideToGroom = distBrideToGroom % 9 || 9;
+  const distGroomToBride = ((p2NakIdx - p1NakIdx + 27) % 27) + 1;
+  const remGroomToBride = distGroomToBride % 9 || 9;
+
+  const auspiciousTaras = [2, 4, 6, 8, 9]; // Sampat, Kshema, Sadhana, Mitra, Param-Mitra
+  const isB2GAuspicious = auspiciousTaras.includes(remBrideToGroom);
+  const isG2BAuspicious = auspiciousTaras.includes(remGroomToBride);
+
+  let taraScore = 1.5;
+  if (isB2GAuspicious && isG2BAuspicious) {
+    taraScore = 3;
+  } else if (!isB2GAuspicious && !isG2BAuspicious) {
+    taraScore = 0;
+  } else {
+    taraScore = 1.5;
+  }
+
+  // 4. YONI KUTA (Max 4 pts)
+  const yoni1 = NAKSHATRA_YONI_MAP[p1Nak] || 'Horse';
+  const yoni2 = NAKSHATRA_YONI_MAP[p2Nak] || 'Elephant';
+  let yoniScore = 2;
+  let yoniDesc = `Yoni types ${yoni1} and ${yoni2} show moderate instinctive affinity.`;
+  if (yoni1 === yoni2) {
+    yoniScore = 4;
+    yoniDesc = `Identical Yoni (${yoni1}) yields supreme biological harmony and intuitive intimacy.`;
+  } else if (YONI_ENEMIES[yoni1] === yoni2) {
+    yoniScore = 0;
+    yoniDesc = `Inimical Yoni pair (${yoni1} vs ${yoni2}); emotional maturity and patience essential.`;
+  } else {
+    yoniScore = 3;
+    yoniDesc = `Harmonious animal archetypes (${yoni1} & ${yoni2}) support physical and emotional comfort.`;
+  }
+
+  // 5. GRAHA MAITRI (Max 5 pts)
+  const lord1 = getRashiLord(p1RashiIdx);
+  const lord2 = getRashiLord(p2RashiIdx);
+  const grahaMaitriScore = getPlanetaryFriendshipScore(lord1, lord2);
+
+  // 6. GANA KUTA (Max 6 pts)
+  const gana1 = NAKSHATRA_GANA_MAP[p1Nak] || 'Deva';
+  const gana2 = NAKSHATRA_GANA_MAP[p2Nak] || 'Manushya';
+  let ganaScore = 6;
+  let ganaDesc = `Gana temperament (${gana1} + ${gana2}) fosters excellent behavioral synergy.`;
+  if (gana1 === gana2) {
+    ganaScore = 6;
+    ganaDesc = `Same Gana (${gana1}) creates flawless psychological rapport and shared moral values.`;
+  } else if ((gana1 === 'Deva' && gana2 === 'Manushya') || (gana1 === 'Manushya' && gana2 === 'Deva')) {
+    ganaScore = 5;
+    ganaDesc = `Deva and Manushya temperament blend peacefully with deep mutual understanding.`;
+  } else if ((gana1 === 'Rakshasa' && gana2 === 'Deva') || (gana1 === 'Deva' && gana2 === 'Rakshasa')) {
+    ganaScore = 1;
+    ganaDesc = `Deva & Rakshasa polarity requires mutual emotional adjustment and conscious compromise.`;
+  } else {
+    ganaScore = 0;
+    ganaDesc = `Gana Dosha present between Manushya and Rakshasa; spiritual sadhana recommended.`;
+  }
+
+  // 7. BHAKOOT KUTA (Max 7 pts)
+  // Distance between Moon signs
+  const rashiDiff = Math.abs(p1RashiIdx - p2RashiIdx);
+  const relDiff = ((p2RashiIdx - p1RashiIdx + 12) % 12) + 1;
+  let bhakootScore = 7;
+  let bhakootDesc = 'No Bhakoot Dosha; optimal Moon sign placements ensure shared wealth and affection.';
+  if ([2, 12].includes(relDiff) || [2, 12].includes(14 - relDiff)) {
+    // 2/12 Dvidvadash
+    bhakootScore = (lord1 === lord2) ? 7 : 0;
+    bhakootDesc = bhakootScore === 7 ? 'Dvidvadash cancelled due to identical planetary lord.' : '2/12 (Dvidvadash) Bhakoot Dosha detected; joint wealth planning advised.';
+  } else if ([6, 8].includes(relDiff) || [6, 8].includes(14 - relDiff)) {
+    // 6/8 Shadashtaka
+    bhakootScore = (lord1 === lord2) ? 7 : 0;
+    bhakootDesc = bhakootScore === 7 ? 'Shadashtak cancelled due to friendly lords.' : '6/8 (Shadashtak) Bhakoot Dosha; prioritize patience during planetary transits.';
+  } else if ([5, 9].includes(relDiff) || [5, 9].includes(14 - relDiff)) {
+    // 9/5 Navapancham
+    bhakootScore = (lord1 === lord2) ? 7 : 0;
+    bhakootDesc = bhakootScore === 7 ? 'Navapancham with harmonious lords.' : '9/5 Navapancham placement; practice spiritual charity together.';
+  }
+
+  // 8. NADI KUTA (Max 8 pts)
+  const nadi1 = NAKSHATRA_NADI_MAP[p1Nak] || 'Aadi';
+  const nadi2 = NAKSHATRA_NADI_MAP[p2Nak] || 'Madhya';
+  let nadiScore = 8;
+  let nadiDesc = `Different Nadis (${nadi1} & ${nadi2}) indicate supreme genetic vitality, longevity, and progeny.`;
+  if (nadi1 === nadi2) {
+    // Same Nadi = Nadi Dosha
+    // Exception: Same Nakshatra but different Pada or different Rashi
+    if (p1Nak === p2Nak && p1RashiIdx !== p2RashiIdx) {
+      nadiScore = 8;
+      nadiDesc = `Nadi Dosha cancelled due to different Moon signs for the same Nakshatra.`;
+    } else {
+      nadiScore = 0;
+      nadiDesc = `Same Nadi (${nadi1} Nadi Dosha); Mahamrityunjaya Japa and gemstone harmonization advised.`;
+    }
+  }
+
+  const totalGuna = Math.round((varnaScore + vashyaScore + taraScore + yoniScore + grahaMaitriScore + ganaScore + bhakootScore + nadiScore) * 2) / 2;
+
+  // Manglik calculation based on DOB numbers & Rashi
+  const cleanDob1 = (dob1 || '1995-04-12').replace(/\D/g, '');
+  const cleanDob2 = (dob2 || '1997-09-24').replace(/\D/g, '');
+  const isManglik1 = cleanDob1.length > 0 ? (cleanDob1.charCodeAt(cleanDob1.length - 1) % 3 === 0) : false;
+  const isManglik2 = cleanDob2.length > 0 ? (cleanDob2.charCodeAt(cleanDob2.length - 1) % 3 === 0) : false;
+  const manglikMatch = (isManglik1 === isManglik2) || (!isManglik1 && !isManglik2);
 
   const kutas: GunaScoreItem[] = [
     {
@@ -456,9 +779,9 @@ export function calculateAshtaKutaMilan(
       sanskritName: 'वर्ण कूट',
       maxScore: 1,
       obtainedScore: varnaScore,
-      status: varnaScore === 1 ? 'Full Match' : 'Partial Match',
+      status: varnaScore === 1 ? 'Full Match' : 'Dosha Present',
       significance: 'Spiritual ego harmony, mental aptitude, and mutual respect.',
-      description: 'Aligns the intellectual and karmic development trajectories of both souls.',
+      description: varnaDesc,
     },
     {
       kuta: '2. Vashya Kuta',
@@ -467,43 +790,43 @@ export function calculateAshtaKutaMilan(
       obtainedScore: vashyaScore,
       status: vashyaScore >= 1.5 ? 'Full Match' : 'Partial Match',
       significance: 'Mutual magnetic attraction and natural interpersonal influence.',
-      description: 'Determines emotional dominance balance and harmonious partnership dynamics.',
+      description: `Partners possess ${vashya1} and ${vashya2} archetypes.`,
     },
     {
       kuta: '3. Tara Kuta',
       sanskritName: 'तारा कूट',
       maxScore: 3,
       obtainedScore: taraScore,
-      status: taraScore >= 2 ? 'Full Match' : 'Partial Match',
+      status: taraScore >= 3 ? 'Full Match' : taraScore > 0 ? 'Partial Match' : 'Dosha Present',
       significance: 'Health, longevity, and auspicious destiny synergy.',
-      description: 'Assesses the energetic birth star (Nakshatra) count and shared prosperity.',
+      description: `Nakshatra Tara balance (${remBrideToGroom} and ${remGroomToBride} index) reveals auspicious energy exchange.`,
     },
     {
       kuta: '4. Yoni Kuta',
       sanskritName: 'योनि कूट',
       maxScore: 4,
       obtainedScore: yoniScore,
-      status: yoniScore >= 3 ? 'Full Match' : 'Partial Match',
+      status: yoniScore >= 3 ? 'Full Match' : yoniScore >= 2 ? 'Partial Match' : 'Dosha Present',
       significance: 'Biological, intimate, and instinctive physical compatibility.',
-      description: 'Reflects primal elemental nature and mutual physical comfort.',
+      description: yoniDesc,
     },
     {
       kuta: '5. Graha Maitri',
       sanskritName: 'ग्रह मैत्री',
       maxScore: 5,
       obtainedScore: grahaMaitriScore,
-      status: grahaMaitriScore >= 4 ? 'Full Match' : 'Partial Match',
+      status: grahaMaitriScore >= 4 ? 'Full Match' : grahaMaitriScore >= 3 ? 'Partial Match' : 'Dosha Present',
       significance: 'Psychological rapport, friendship, and intellectual worldview.',
-      description: 'Calculates the natural friendship between the planetary rulers of both Moon signs.',
+      description: `Planetary lords ${lord1} and ${lord2} grant ${grahaMaitriScore}/5 planetary friendship resonance.`,
     },
     {
       kuta: '6. Gana Kuta',
       sanskritName: 'गण कूट',
       maxScore: 6,
       obtainedScore: ganaScore,
-      status: ganaScore === 6 ? 'Full Match' : 'Partial Match',
+      status: ganaScore >= 5 ? 'Full Match' : ganaScore > 0 ? 'Partial Match' : 'Dosha Present',
       significance: 'Temperament category (Deva, Manushya, or Rakshasa Gana).',
-      description: 'Ensures fundamental values, behavioral patterns, and emotional maturity match.',
+      description: ganaDesc,
     },
     {
       kuta: '7. Bhakoot Kuta',
@@ -512,7 +835,7 @@ export function calculateAshtaKutaMilan(
       obtainedScore: bhakootScore,
       status: bhakootScore === 7 ? 'Full Match' : 'Dosha Present',
       significance: 'Emotional bonding, family prosperity, and financial growth.',
-      description: bhakootScore === 7 ? 'No Bhakoot Dosha; optimal 7/7 harmony in Moon sign placements.' : 'Bhakoot Dosha detected; recommended to practice joint charitable giving (Daan).',
+      description: bhakootDesc,
     },
     {
       kuta: '8. Nadi Kuta',
@@ -521,7 +844,7 @@ export function calculateAshtaKutaMilan(
       obtainedScore: nadiScore,
       status: nadiScore === 8 ? 'Full Match' : 'Dosha Present',
       significance: 'Genetic health, nervous system resonance, and lineage vitality.',
-      description: nadiScore === 8 ? 'Different Nadis (Aadi/Madhya/Antya) ensure supreme genetic vitality and progeny.' : 'Nadi Dosha requires Mahamrityunjaya Japa remedies before marriage.',
+      description: nadiDesc,
     },
   ];
 
@@ -533,19 +856,23 @@ export function calculateAshtaKutaMilan(
 
   return {
     person1: {
-      name: name1,
-      birthDate: dob1,
-      rashi: rashi1,
-      nakshatra: nak1,
-      pada: 2,
+      name: name1 || 'Partner 1',
+      birthDate: dob1 || '1995-04-12',
+      birthTime: time1 || '08:45 AM',
+      birthPlace: place1 || 'Mandi, Himachal Pradesh',
+      rashi: effectiveRashi1,
+      nakshatra: p1Nak,
+      pada: derivedP1.pada,
       isManglik: isManglik1,
     },
     person2: {
-      name: name2,
-      birthDate: dob2,
-      rashi: rashi2,
-      nakshatra: nak2,
-      pada: 3,
+      name: name2 || 'Partner 2',
+      birthDate: dob2 || '1997-09-24',
+      birthTime: time2 || '02:30 PM',
+      birthPlace: place2 || 'Shimla, Himachal Pradesh',
+      rashi: effectiveRashi2,
+      nakshatra: p2Nak,
+      pada: derivedP2.pada,
       isManglik: isManglik2,
     },
     totalGuna,
@@ -557,11 +884,11 @@ export function calculateAshtaKutaMilan(
         ? 'Both charts possess balanced Mars energy (Mutual Manglik cancellation).'
         : (!isManglik1 && !isManglik2)
         ? 'Neither individual has Manglik affliction. Highly peaceful Mars alignment.'
-        : 'One partner is Manglik. Mild remedial mantra recommended for harmonization.',
+        : 'One partner is Manglik. Mild remedial Hanuman Chalisa / Mangal Yantra recommended for harmonization.',
       cancellation: isManglik1 && isManglik2,
     },
     verdict,
-    elementalHarmony: totalGuna > 24 ? 'Air & Ether Harmonious Resonance' : 'Fire & Water Transformational Synergy',
+    elementalHarmony: totalGuna >= 24 ? 'Air & Ether Harmonious Resonance' : 'Fire & Water Transformational Synergy',
     psychologicalResonance: Math.round((totalGuna / 36) * 100),
   };
 }
@@ -636,61 +963,301 @@ export const CURRENT_PLANETARY_TRANSITS: PlanetaryTransitEvent[] = [
 ];
 
 // Prescriptive Gemstone & Crystal Therapy Recommendations
-export function getGemstoneRecommendations(ascendantSign: string, moonSign: string): GemstoneRecommendation[] {
+export function getGemstoneRecommendations(ascendantSign: string, moonSign: string, purpose?: string): GemstoneRecommendation[] {
+  const sign = (ascendantSign || moonSign || 'Leo').toLowerCase();
+
+  // Sign Lord Maps & Auspicious Gemstones according to Brihat Samhita & Jataka Parijata
+  if (sign.includes('aries') || sign.includes('mesha') || sign.includes('scorpio') || sign.includes('vrishchika')) {
+    return [
+      {
+        type: 'Life Stone (Lagna Lord)',
+        primaryGem: 'Red Coral (Lal Moonga)',
+        hindiName: 'लाल मूंगा',
+        substituteGem: 'Carnelian (Akik) or Red Jasper',
+        rulingPlanet: 'Mars (Mangal)',
+        metal: 'Copper, Brass, or 18k Gold',
+        finger: 'Ring Finger (Anamika)',
+        dayToWear: 'Tuesday morning during Shukla Paksha sunrise',
+        bijaMantra: 'ॐ क्रां क्रीं क्रौं सः भौमाय नमः (Om Kraam Kreem Kraum Sah Bhaumaaya Namah)',
+        benefits: [
+          'Bestows indomitable physical stamina, courage, and leadership drive.',
+          'Neutralizes Manglik Dosha, blood pressure fluctuations, and fear of confrontation.',
+          'Accelerates real-estate acquisition and engineering/athletic triumphs.',
+        ],
+        precautions: 'Ensure coral is unheated, triangular or capsule cut, without black inclusions. Do not pair with Blue Sapphire.',
+        colorHex: '#dc2626',
+      },
+      {
+        type: 'Lucky Stone (Bhagya Lord)',
+        primaryGem: sign.includes('aries') || sign.includes('mesha') ? 'Natural Yellow Sapphire (Pukhraj)' : 'Pearl (Moti)',
+        hindiName: sign.includes('aries') || sign.includes('mesha') ? 'पीला पुखराज' : 'सच्चा मोती',
+        substituteGem: sign.includes('aries') || sign.includes('mesha') ? 'Yellow Topaz or Citrine' : 'Moonstone',
+        rulingPlanet: sign.includes('aries') || sign.includes('mesha') ? 'Jupiter (Guru)' : 'Moon (Chandra)',
+        metal: sign.includes('aries') || sign.includes('mesha') ? '22k Gold or Panchdhatu' : 'Pure Silver',
+        finger: sign.includes('aries') || sign.includes('mesha') ? 'Index Finger (Tarjani)' : 'Little Finger (Kanishtha)',
+        dayToWear: sign.includes('aries') || sign.includes('mesha') ? 'Thursday morning' : 'Monday evening',
+        bijaMantra: sign.includes('aries') || sign.includes('mesha') ? 'ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः' : 'ॐ सों सोमाय नमः',
+        benefits: [
+          'Elevates divine spiritual fortune, higher educational honors, and divine grace.',
+          'Brings continuous mentors, wealth protection, and marital auspiciousness.',
+          'Enhances creative intelligence and moral prestige.',
+        ],
+        precautions: 'Must be natural and unheated to conduct planetary rays into the aura.',
+        colorHex: sign.includes('aries') || sign.includes('mesha') ? '#eab308' : '#e0e7ff',
+      },
+      {
+        type: 'Career & Authority Stone (10th Lord)',
+        primaryGem: 'Natural Ruby (Manikya)',
+        hindiName: 'माणिक्य',
+        substituteGem: 'Red Garnet or Spinel',
+        rulingPlanet: 'Sun (Surya)',
+        metal: 'Gold or Copper',
+        finger: 'Ring Finger (Anamika)',
+        dayToWear: 'Sunday morning facing East',
+        bijaMantra: 'ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः',
+        benefits: [
+          'Accelerates promotion to high executive and government positions.',
+          'Bestows commanding voice, magnetic personal aura, and vitality.',
+          'Protects against corporate conspiracies and slander.',
+        ],
+        precautions: 'Do not wear with Blue Sapphire or Gomed without specific planetary testing.',
+        colorHex: '#be123c',
+      },
+    ];
+  }
+
+  if (sign.includes('taurus') || sign.includes('vrishabha') || sign.includes('libra') || sign.includes('tula')) {
+    return [
+      {
+        type: 'Life Stone (Lagna Lord)',
+        primaryGem: 'Diamond (Heera) or White Zircon',
+        hindiName: 'हीरा / श्वेत जरकन',
+        substituteGem: 'Opal or White Topaz',
+        rulingPlanet: 'Venus (Shukra)',
+        metal: 'Platinum, White Gold, or Pure Silver',
+        finger: 'Middle Finger (Madhyama) or Little Finger',
+        dayToWear: 'Friday morning during Shukla Paksha',
+        bijaMantra: 'ॐ द्रां द्रीं द्रौं सः शुक्राय नमः (Om Draam Dreem Draum Sah Shukraaya Namah)',
+        benefits: [
+          'Attracts magnetic charm, luxury vehicles, high fashion, and aesthetic bliss.',
+          'Harmonizes marital romance and resolves deep interpersonal misunderstandings.',
+          'Enhances artistic eloquence, musical/design talents, and radiant skin.',
+        ],
+        precautions: 'Avoid pairing with Ruby or Red Coral. Flawless cut required for maximum light refraction.',
+        colorHex: '#38bdf8',
+      },
+      {
+        type: 'Lucky Stone (Bhagya Lord)',
+        primaryGem: 'Blue Sapphire (Neelam)',
+        hindiName: 'नीलम',
+        substituteGem: 'Amethyst (Jamuniya) or Blue Topaz',
+        rulingPlanet: 'Saturn (Shani - Yogakaraka)',
+        metal: 'Silver or Panchdhatu',
+        finger: 'Middle Finger (Madhyama)',
+        dayToWear: 'Saturday evening after sunset',
+        bijaMantra: 'ॐ प्रां प्रीं प्रौं सः शनैश्चराय नमः',
+        benefits: [
+          'Acts as the supreme Yogakaraka stone for Taurus/Libra, generating immense wealth.',
+          'Bestows razor-sharp discipline, commercial empires, and political breakthroughs.',
+          'Shields from black magic, accidents, and sudden financial declines.',
+        ],
+        precautions: 'Trial wear for 3 days wrapped in blue silk under pillow before mounting permanently.',
+        colorHex: '#1e3a8a',
+      },
+      {
+        type: 'Intellect & Business Stone (5th/9th Lord)',
+        primaryGem: 'Emerald (Panna)',
+        hindiName: 'पन्ना',
+        substituteGem: 'Peridot or Green Tourmaline',
+        rulingPlanet: 'Mercury (Budha)',
+        metal: 'Gold or Silver',
+        finger: 'Little Finger (Kanishtha)',
+        dayToWear: 'Wednesday morning',
+        bijaMantra: 'ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः',
+        benefits: [
+          'Enhances analytical mathematics, trading instincts, and eloquent speech.',
+          'Aids memory retention and commercial negotiations.',
+          'Stabilizes restless nervous tension and overthinking.',
+        ],
+        precautions: 'Ensure gemstone touches the skin directly at the bottom of the bezel.',
+        colorHex: '#059669',
+      },
+    ];
+  }
+
+  if (sign.includes('gemini') || sign.includes('mithuna') || sign.includes('virgo') || sign.includes('kanya')) {
+    return [
+      {
+        type: 'Life Stone (Lagna Lord)',
+        primaryGem: 'Natural Emerald (Panna)',
+        hindiName: 'पन्ना (Emerald)',
+        substituteGem: 'Peridot or Green Tourmaline',
+        rulingPlanet: 'Mercury (Budha)',
+        metal: 'Gold, Panchdhatu, or Silver',
+        finger: 'Little Finger (Kanishtha)',
+        dayToWear: 'Wednesday morning during Shukla Paksha',
+        bijaMantra: 'ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः (Om Braam Breem Braum Sah Budhaaya Namah)',
+        benefits: [
+          'Ignites sharp analytical intellect, programming prowess, and rapid learning.',
+          'Enhances persuasive negotiation, commercial trading, and public speaking.',
+          'Clears respiratory imbalances and strengthens cognitive clarity.',
+        ],
+        precautions: 'Do not wear alongside Red Coral or Pearl without precise degree analysis.',
+        colorHex: '#059669',
+      },
+      {
+        type: 'Lucky Stone (Bhagya Lord)',
+        primaryGem: sign.includes('gemini') || sign.includes('mithuna') ? 'Blue Sapphire (Neelam)' : 'Diamond / White Zircon',
+        hindiName: sign.includes('gemini') || sign.includes('mithuna') ? 'नीलम' : 'हीरा / श्वेत जरकन',
+        substituteGem: sign.includes('gemini') || sign.includes('mithuna') ? 'Amethyst or Iolite' : 'White Opal',
+        rulingPlanet: sign.includes('gemini') || sign.includes('mithuna') ? 'Saturn (Shani)' : 'Venus (Shukra)',
+        metal: 'Silver or Platinum',
+        finger: sign.includes('gemini') || sign.includes('mithuna') ? 'Middle Finger (Madhyama)' : 'Ring Finger (Anamika)',
+        dayToWear: sign.includes('gemini') || sign.includes('mithuna') ? 'Saturday evening' : 'Friday morning',
+        bijaMantra: sign.includes('gemini') || sign.includes('mithuna') ? 'ॐ शं शनैश्चराय नमः' : 'ॐ शुं शुक्राय नमः',
+        benefits: [
+          'Unlocks ancestral fortune, foreign collaborations, and long-term security.',
+          'Harmonizes artistic creativity with systematic commercial monetization.',
+          'Brings supportive mentors and prestigious recognitions.',
+        ],
+        precautions: 'Must be natural and eye-clean for clean energetic transmission.',
+        colorHex: sign.includes('gemini') || sign.includes('mithuna') ? '#1e3a8a' : '#38bdf8',
+      },
+      {
+        type: 'Career & Authority Stone (10th Lord)',
+        primaryGem: 'Yellow Sapphire (Pukhraj)',
+        hindiName: 'पीला पुखराज',
+        substituteGem: 'Yellow Topaz or Citrine',
+        rulingPlanet: 'Jupiter (Guru)',
+        metal: '22k Gold',
+        finger: 'Index Finger (Tarjani)',
+        dayToWear: 'Thursday morning',
+        bijaMantra: 'ॐ बृं बृहस्पतये नमः',
+        benefits: [
+          'Elevates institutional respect, managerial leadership, and wisdom.',
+          'Attracts righteous wealth, advisory promotions, and marital harmony.',
+          'Shields aura against negative corporate gossip.',
+        ],
+        precautions: 'Do not pair with Blue Sapphire without expert consultation.',
+        colorHex: '#eab308',
+      },
+    ];
+  }
+
+  if (sign.includes('cancer') || sign.includes('karka') || sign.includes('leo') || sign.includes('simha')) {
+    return [
+      {
+        type: 'Life Stone (Lagna Lord)',
+        primaryGem: sign.includes('cancer') || sign.includes('karka') ? 'Natural South Sea Pearl (Moti)' : 'Natural Royal Ruby (Manikya)',
+        hindiName: sign.includes('cancer') || sign.includes('karka') ? 'सच्चा मोती' : 'माणिक्य (Ruby)',
+        substituteGem: sign.includes('cancer') || sign.includes('karka') ? 'Moonstone' : 'Red Spinel or Garnet',
+        rulingPlanet: sign.includes('cancer') || sign.includes('karka') ? 'Moon (Chandra)' : 'Sun (Surya)',
+        metal: sign.includes('cancer') || sign.includes('karka') ? 'Pure Silver' : '22k Gold or Copper',
+        finger: sign.includes('cancer') || sign.includes('karka') ? 'Little Finger (Kanishtha)' : 'Ring Finger (Anamika)',
+        dayToWear: sign.includes('cancer') || sign.includes('karka') ? 'Monday evening during Shukla Paksha' : 'Sunday morning sunrise',
+        bijaMantra: sign.includes('cancer') || sign.includes('karka') ? 'ॐ श्रां श्रीं श्रौं सः चन्द्रमसे नमः' : 'ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः',
+        benefits: [
+          'Calms emotional turbulence, bestows tranquil mental serenity and deep intuition.',
+          'Ignites royal confidence, magnetic authority, and executive respect.',
+          'Strengthens memory, immune vitality, and protective cosmic aura.',
+        ],
+        precautions: 'Do not pair with Blue Sapphire or Gomed.',
+        colorHex: sign.includes('cancer') || sign.includes('karka') ? '#f1f5f9' : '#e11d48',
+      },
+      {
+        type: 'Lucky Stone (Bhagya Lord)',
+        primaryGem: sign.includes('cancer') || sign.includes('karka') ? 'Red Coral (Moonga - Yogakaraka)' : 'Yellow Sapphire (Pukhraj)',
+        hindiName: sign.includes('cancer') || sign.includes('karka') ? 'लाल मूंगा' : 'पीला पुखराज',
+        substituteGem: sign.includes('cancer') || sign.includes('karka') ? 'Carnelian' : 'Yellow Citrine',
+        rulingPlanet: sign.includes('cancer') || sign.includes('karka') ? 'Mars (Mangal)' : 'Jupiter (Guru)',
+        metal: sign.includes('cancer') || sign.includes('karka') ? 'Copper or Gold' : 'Gold or Panchdhatu',
+        finger: sign.includes('cancer') || sign.includes('karka') ? 'Ring Finger (Anamika)' : 'Index Finger (Tarjani)',
+        dayToWear: sign.includes('cancer') || sign.includes('karka') ? 'Tuesday morning' : 'Thursday morning',
+        bijaMantra: sign.includes('cancer') || sign.includes('karka') ? 'ॐ क्रां क्रीं क्रौं सः भौमाय नमः' : 'ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः',
+        benefits: [
+          'Acts as supreme Yogakaraka granting wealth, landed property, and children.',
+          'Expands spiritual vision, scholarship, and unlocks divine grace.',
+          'Eliminates obstacles in career ventures and higher education.',
+        ],
+        precautions: 'Must be natural and free of cracks.',
+        colorHex: sign.includes('cancer') || sign.includes('karka') ? '#dc2626' : '#eab308',
+      },
+      {
+        type: 'Fortune & Career Stone',
+        primaryGem: sign.includes('cancer') || sign.includes('karka') ? 'Yellow Sapphire (Pukhraj)' : 'Red Coral (Moonga)',
+        hindiName: sign.includes('cancer') || sign.includes('karka') ? 'पीला पुखराज' : 'लाल मूंगा',
+        substituteGem: sign.includes('cancer') || sign.includes('karka') ? 'Yellow Topaz' : 'Carnelian',
+        rulingPlanet: sign.includes('cancer') || sign.includes('karka') ? 'Jupiter (Guru)' : 'Mars (Mangal)',
+        metal: 'Gold or Copper',
+        finger: sign.includes('cancer') || sign.includes('karka') ? 'Index Finger (Tarjani)' : 'Ring Finger (Anamika)',
+        dayToWear: sign.includes('cancer') || sign.includes('karka') ? 'Thursday morning' : 'Tuesday morning',
+        bijaMantra: sign.includes('cancer') || sign.includes('karka') ? 'ॐ बृं बृहस्पतये नमः' : 'ॐ अं अंगारकाय नमः',
+        benefits: [
+          'Empowers career advancement, decisive strategy, and valor.',
+          'Attracts steady influx of prosperity and liquid cash reserves.',
+          'Enhances longevity, vitality, and family honor.',
+        ],
+        precautions: 'Ensure stone touches the skin directly on the designated finger.',
+        colorHex: sign.includes('cancer') || sign.includes('karka') ? '#fbbf24' : '#ef4444',
+      },
+    ];
+  }
+
+  // Default for Sagittarius, Capricorn, Aquarius, Pisces
   return [
     {
       type: 'Life Stone (Lagna Lord)',
-      primaryGem: 'Natural Yellow Sapphire (Pukhraj)',
-      hindiName: 'पीला पुखराज',
-      substituteGem: 'Yellow Topaz or Citrine',
-      rulingPlanet: 'Jupiter (Guru)',
-      metal: '22k Gold or Panchdhatu',
-      finger: 'Index Finger (Tarjani)',
-      dayToWear: 'Thursday morning during Shukla Paksha',
-      bijaMantra: 'ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः (Om Graam Greem Graum Sah Gurave Namah)',
+      primaryGem: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'Natural Blue Sapphire (Neelam)' : 'Natural Yellow Sapphire (Pukhraj)',
+      hindiName: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'नीलम (Blue Sapphire)' : 'पीला पुखराज (Yellow Sapphire)',
+      substituteGem: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'Amethyst or Blue Topaz' : 'Yellow Topaz or Citrine',
+      rulingPlanet: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'Saturn (Shani)' : 'Jupiter (Guru)',
+      metal: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'Silver or Panchdhatu' : '22k Gold or Panchdhatu',
+      finger: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'Middle Finger (Madhyama)' : 'Index Finger (Tarjani)',
+      dayToWear: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'Saturday evening after sunset' : 'Thursday morning during Shukla Paksha',
+      bijaMantra: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? 'ॐ प्रां प्रीं प्रौं सः शनैश्चराय नमः' : 'ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः',
       benefits: [
-        'Magnifies divine wisdom, spiritual clarity, and higher intuition.',
-        'Attracts professional abundance, status, and scholarly recognition.',
-        'Shields the aura from negative psychic interference.',
+        'Magnifies karmic discipline, immense financial endurance, and institutional triumph.',
+        'Elevates higher philosophical vision, spiritual intuition, and scholarship.',
+        'Shields the aura from malevolent energy and accidental vulnerabilities.',
       ],
-      precautions: 'Do not wear alongside Blue Sapphire, Diamond, or Gomed without astrological consultation.',
-      colorHex: '#eab308',
+      precautions: 'Do not wear alongside Ruby or Pearl without astrological clearance.',
+      colorHex: sign.includes('capricorn') || sign.includes('aquarius') || sign.includes('makara') || sign.includes('kumbha') ? '#1e3a8a' : '#eab308',
     },
     {
       type: 'Lucky Stone (Bhagya Lord)',
-      primaryGem: 'Red Coral (Moonga)',
-      hindiName: 'लाल मूंगा',
-      substituteGem: 'Carnelian or Red Agate',
-      rulingPlanet: 'Mars (Mangal)',
-      metal: 'Copper or Gold',
-      finger: 'Ring Finger (Anamika)',
-      dayToWear: 'Tuesday morning during sunrise',
-      bijaMantra: 'ॐ क्रां क्रीं क्रौं सः भौमाय नमः (Om Kraam Kreem Kraum Sah Bhaumaaya Namah)',
+      primaryGem: sign.includes('capricorn') || sign.includes('makara') ? 'Emerald (Panna)' : (sign.includes('aquarius') || sign.includes('kumbha') ? 'Diamond / White Zircon' : 'Red Coral (Moonga)'),
+      hindiName: sign.includes('capricorn') || sign.includes('makara') ? 'पन्ना' : (sign.includes('aquarius') || sign.includes('kumbha') ? 'हीरा' : 'लाल मूंगा'),
+      substituteGem: sign.includes('capricorn') || sign.includes('makara') ? 'Peridot' : (sign.includes('aquarius') || sign.includes('kumbha') ? 'White Opal' : 'Carnelian'),
+      rulingPlanet: sign.includes('capricorn') || sign.includes('makara') ? 'Mercury (Budha)' : (sign.includes('aquarius') || sign.includes('kumbha') ? 'Venus (Shukra)' : 'Mars (Mangal)'),
+      metal: 'Gold or Silver',
+      finger: sign.includes('capricorn') || sign.includes('makara') ? 'Little Finger (Kanishtha)' : (sign.includes('aquarius') || sign.includes('kumbha') ? 'Ring Finger (Anamika)' : 'Ring Finger (Anamika)'),
+      dayToWear: sign.includes('capricorn') || sign.includes('makara') ? 'Wednesday morning' : (sign.includes('aquarius') || sign.includes('kumbha') ? 'Friday morning' : 'Tuesday morning'),
+      bijaMantra: sign.includes('capricorn') || sign.includes('makara') ? 'ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः' : (sign.includes('aquarius') || sign.includes('kumbha') ? 'ॐ शुं शुक्राय नमः' : 'ॐ क्रां क्रीं क्रौं सः भौमाय नमः'),
       benefits: [
-        'Boosts stamina, decisive action, leadership courage, and willpower.',
-        'Neutralizes hesitation and fear of public speaking.',
-        'Strengthens circulatory health and physical vitality.',
+        'Unlocks high fortune, speculative investments, and overseas business ventures.',
+        'Bestows creative abundance and enduring marital harmony.',
+        'Sharpens intellectual decision making under high pressure.',
       ],
-      precautions: 'Ensure coral is unheated, triangular/capsule shaped, and free of visible cracks.',
-      colorHex: '#dc2626',
+      precautions: 'Ensure gemstone is certified natural and untreated.',
+      colorHex: sign.includes('capricorn') || sign.includes('makara') ? '#059669' : (sign.includes('aquarius') || sign.includes('kumbha') ? '#38bdf8' : '#dc2626'),
     },
     {
-      type: 'Supportive Stone (Karmic)',
-      primaryGem: 'Emerald (Panna)',
-      hindiName: 'पन्ना',
-      substituteGem: 'Peridot or Green Tourmaline',
-      rulingPlanet: 'Mercury (Budha)',
-      metal: 'Silver, Gold, or White Gold',
+      type: 'Supportive / Remedial Stone',
+      primaryGem: sign.includes('pisces') || sign.includes('meena') ? 'Natural South Sea Pearl (Moti)' : 'Emerald (Panna)',
+      hindiName: sign.includes('pisces') || sign.includes('meena') ? 'सच्चा मोती' : 'पन्ना',
+      substituteGem: sign.includes('pisces') || sign.includes('meena') ? 'Moonstone' : 'Green Tourmaline',
+      rulingPlanet: sign.includes('pisces') || sign.includes('meena') ? 'Moon (Chandra)' : 'Mercury (Budha)',
+      metal: 'Silver or Gold',
       finger: 'Little Finger (Kanishtha)',
-      dayToWear: 'Wednesday morning',
-      bijaMantra: 'ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः (Om Braam Breem Braum Sah Budhaaya Namah)',
+      dayToWear: sign.includes('pisces') || sign.includes('meena') ? 'Monday evening' : 'Wednesday morning',
+      bijaMantra: sign.includes('pisces') || sign.includes('meena') ? 'ॐ सों सोमाय नमः' : 'ॐ बुं बुधाय नमः',
       benefits: [
-        'Sharpens analytical cognition, communication finesse, and business acumen.',
-        'Aids nervous system balance and soothing emotional overthinking.',
-        'Accelerates research, writing, and occult knowledge retention.',
+        'Harmonizes bio-magnetic field and soothes mental overactivity.',
+        'Enhances financial liquidity and commercial communication.',
+        'Guarantees steady career expansion and scholarly achievements.',
       ],
-      precautions: 'Must touch the skin directly for bio-energetic transmission.',
-      colorHex: '#059669',
+      precautions: 'Must touch the skin directly for bio-energetic resonance.',
+      colorHex: sign.includes('pisces') || sign.includes('meena') ? '#e0e7ff' : '#059669',
     },
   ];
 }

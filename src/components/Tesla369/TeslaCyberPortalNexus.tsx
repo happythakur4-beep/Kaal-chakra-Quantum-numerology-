@@ -14,6 +14,13 @@ import { TeslaIntroAnimation } from './TeslaIntroAnimation';
 import { VortexMathOverlayD3 } from './VortexMathOverlayD3';
 import { CosmicPlanetaryAlignmentHomepage } from './CosmicPlanetaryAlignmentHomepage';
 import { SudarshanSacredMatrixGallery } from './SudarshanSacredMatrixGallery';
+import { PlanetOrrery3D } from './PlanetOrrery3D';
+import { DeepSpaceVortexOrrery3D } from './DeepSpaceVortexOrrery3D';
+import { TeslaEtherEnergyField3D } from './TeslaEtherEnergyField3D';
+import { DeepSpaceSingularityCore } from './DeepSpaceSingularityCore';
+import { TeslaEarthVortexMapsRadar } from './TeslaEarthVortexMapsRadar';
+import { BirthPlanetaryEphemerisModal } from './BirthPlanetaryEphemerisModal';
+import { NatalEphemerisData } from '../../utils/planetaryEphemeris';
 import { cosmicAudio } from '../../utils/audioSynthesizer';
 import {
   Sparkles,
@@ -32,7 +39,12 @@ import {
   Shield,
   Search,
   Eye,
-  Sliders
+  Sliders,
+  MapPin,
+  Globe2,
+  Calendar,
+  RotateCcw,
+  CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -41,7 +53,7 @@ interface TeslaCyberPortalNexusProps {
   user?: UserProfile;
 }
 
-type CyberTab = 'planets' | 'galaxy' | 'terminal' | 'vortex' | 'tune-thrive' | 'blackhole' | 'chakras' | 'etheric';
+type CyberTab = 'planets' | 'maps-radar' | 'sudarshan' | 'galaxy' | 'terminal' | 'tune-thrive' | 'vortex' | 'blackhole' | 'chakras' | 'etheric';
 
 export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
   onExit,
@@ -49,7 +61,7 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
 }) => {
   const [isIntroPlaying, setIsIntroPlaying] = useState(true);
   const [activeTab, setActiveTab] = useState<CyberTab>('planets');
-  const [planetViewMode, setPlanetViewMode] = useState<'alignment' | 'orbit'>('alignment');
+  const [planetViewMode, setPlanetViewMode] = useState<'deep-vortex' | 'alignment' | 'orrery' | 'orbit'>('deep-vortex');
   const [selectedBody, setSelectedBody] = useState<CelestialBodyData>(CELESTIAL_BODIES_DATA[3]); // Earth by default
   const [warpOrigin, setWarpOrigin] = useState<CelestialBodyData | null>(null);
   const [warpDestination, setWarpDestination] = useState<CelestialBodyData | null>(null);
@@ -62,12 +74,19 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
+  // Natal Ephemeris Birth Alignment State (DOB & Location)
+  const [isEphemerisModalOpen, setIsEphemerisModalOpen] = useState(false);
+  const [birthEphemeris, setBirthEphemeris] = useState<NatalEphemerisData | null>(null);
+  const [isBirthLockedMode, setIsBirthLockedMode] = useState(false);
+
   // Subscribe to audio state
   useEffect(() => {
     const unsub = cosmicAudio.subscribe((isPlaying) => {
       setIsSoundscapePlaying(isPlaying);
     });
-    return () => unsub();
+    return () => {
+      unsub();
+    };
   }, []);
 
   const handleToggleSoundscape = () => {
@@ -136,6 +155,7 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
         <DeepPortalViewer
           body={selectedBody}
           allBodies={CELESTIAL_BODIES_DATA}
+          user={user}
           onClose={() => setIsDetailModalOpen(false)}
           onTravelTo={(target) => {
             setIsDetailModalOpen(false);
@@ -149,6 +169,7 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
         <TeslaVortexModal
           node={selectedVortexNode}
           onClose={() => setSelectedVortexNode(null)}
+          onSelectNode={(node) => setSelectedVortexNode(node)}
         />
       )}
 
@@ -186,6 +207,23 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
 
           {/* Quick HUD Action Tools */}
           <div className="flex items-center gap-2 font-mono text-xs">
+            {/* Birth Ephemeris (DOB & Location) */}
+            <button
+              onClick={() => {
+                cosmicAudio.playCyberKeystroke();
+                setIsEphemerisModalOpen(true);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold uppercase transition-all cursor-pointer ${
+                isBirthLockedMode
+                  ? 'bg-amber-500/25 border-amber-400 text-amber-200 shadow-[0_0_15px_rgba(251,191,36,0.35)] animate-pulse'
+                  : 'bg-cyan-950/60 border-cyan-800/50 text-cyan-400 hover:bg-cyan-900/60 hover:text-cyan-200'
+              }`}
+              title="Align planets to exact Birth Date, Time & Location (जन्म समय ग्रह अलाइनमेंट)"
+            >
+              <Calendar className="w-4 h-4 text-amber-400" />
+              <span className="hidden sm:inline">{isBirthLockedMode ? '✨ BIRTH ALIGNED' : '📅 BIRTH ALIGN'}</span>
+            </button>
+
             {/* Toggle D3 Vortex Engine */}
             <button
               onClick={() => {
@@ -251,14 +289,15 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
         <div className="max-w-7xl mx-auto mt-2.5 pt-2 border-t border-cyan-500/20 flex items-center gap-1.5 overflow-x-auto no-scrollbar font-mono text-xs">
           {[
             { id: 'planets', label: '🪐 Planetary Observatory', desc: 'Movie-Grade 3D Planets' },
+            { id: 'maps-radar', label: '🌍 3-6-9 Earth Vortices (Maps Radar)', desc: 'Google Maps Grounded Sacred Grid' },
             { id: 'sudarshan', label: '☸️ Sudarshana & Sacred Chakra Matrix', desc: 'Krishna Chakra & Mantra Vortex' },
             { id: 'galaxy', label: '🌌 Deep Galaxy Warp', desc: 'Nebulae & Relativistic Stars' },
             { id: 'terminal', label: '💻 Cyber Command Console', desc: 'Hacker Shell' },
             { id: 'tune-thrive', label: '✨ Tune & Thrive Vault', desc: 'Frequency Archives' },
             { id: 'vortex', label: '⚡ 3-6-9 Vortex Matrix', desc: 'Tesla Doubling Circuit' },
-            { id: 'blackhole', label: '🕳️ Singularity Core', desc: 'Gargantua Event Horizon' },
+            { id: 'blackhole', label: '🕳️ Singularity & Time-Distortion Core', desc: 'Gravitational Lensing & Quantum Flux' },
             { id: 'chakras', label: '🧬 7-Chakra Biofield', desc: 'Neural Overclock' },
-            { id: 'etheric', label: '🔮 Wardenclyffe Ether', desc: 'Free Radiant Energy' },
+            { id: 'etheric', label: '⚡ 3-6-9 Ether Energy Field 3D', desc: 'Pulsating Scalar Transmission' },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -283,40 +322,121 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
 
       {/* MAIN CYBERNETIC CONTENT AREA */}
       <main className="max-w-7xl mx-auto p-3 sm:p-6 space-y-6 pb-20">
+        {/* Natal Ephemeris Birth Alignment HUD Banner */}
+        {isBirthLockedMode && birthEphemeris && (
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/70 via-purple-950/60 to-cyan-950/70 border-2 border-amber-400/80 shadow-[0_0_35px_rgba(251,191,36,0.3)] backdrop-blur-md flex flex-wrap items-center justify-between gap-4 font-mono text-xs animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/20 border border-amber-400/60 text-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                <Calendar className="w-5 h-5 text-amber-300 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black tracking-wider text-amber-300">
+                    🪐 NATAL BIRTH ALIGNMENT ACTIVE (जन्म समय ग्रह अलाइनमेंट)
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-bold text-[10px] border border-amber-400/40">
+                    LOCK ACTIVE
+                  </span>
+                </div>
+                <div className="text-xs text-cyan-200/90 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span>📅 Born: <strong className="text-white">{birthEphemeris.birthDate}</strong> at <strong className="text-white">{birthEphemeris.birthTime}</strong></span>
+                  <span>📍 <strong className="text-amber-200">{birthEphemeris.birthLocation || birthEphemeris.city || 'Custom Location'}</strong></span>
+                  <span>☸️ Lagna/Ascendant: <strong className="text-amber-300">{birthEphemeris.ascendantSign || birthEphemeris.ascendant.sign} {birthEphemeris.ascendantDegree !== undefined ? `(${birthEphemeris.ascendantDegree.toFixed(1)}°)` : ''}</strong></span>
+                  <span>🌙 Moon: <strong className="text-cyan-300">{birthEphemeris.moonSign}</strong> ({birthEphemeris.moonNakshatra || birthEphemeris.nakshatra})</span>
+                  <span>☀️ Sun: <strong className="text-amber-400">{birthEphemeris.sunSign}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  cosmicAudio.playCyberKeystroke();
+                  setIsEphemerisModalOpen(true);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400 text-amber-200 font-bold text-xs transition-all shadow-[0_0_15px_rgba(251,191,36,0.3)] cursor-pointer"
+              >
+                Change Date / City
+              </button>
+              <button
+                onClick={() => {
+                  cosmicAudio.playCyberKeystroke();
+                  setIsBirthLockedMode(false);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-400/60 text-cyan-200 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Resume Live Orbits</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* 1. PLANETARY OBSERVATORY (HIGH-DEFINITION MOVIE-REALISTIC 3D PLANETS) */}
         {activeTab === 'planets' && (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 px-2 text-xs font-mono text-cyan-400/80">
               {/* Mode Switcher */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center bg-black/60 p-1 rounded-xl border border-cyan-500/30">
+                <div className="flex flex-wrap items-center bg-black/60 p-1 rounded-xl border border-cyan-500/30">
+                  <button
+                    onClick={() => {
+                      cosmicAudio.playCyberKeystroke();
+                      setPlanetViewMode('deep-vortex');
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      planetViewMode === 'deep-vortex'
+                        ? 'bg-gradient-to-r from-purple-600/40 via-cyan-500/40 to-amber-500/40 border border-cyan-400 text-cyan-100 shadow-[0_0_20px_rgba(0,243,255,0.4)]'
+                        : 'text-cyan-400/70 hover:text-cyan-200'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+                    <span>🌌 3D DEEP SPACE VORTEX</span>
+                  </button>
+
                   <button
                     onClick={() => {
                       cosmicAudio.playCyberKeystroke();
                       setPlanetViewMode('alignment');
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       planetViewMode === 'alignment'
                         ? 'bg-gradient-to-r from-amber-500/30 to-cyan-500/30 border border-amber-400/70 text-amber-200 shadow-[0_0_15px_rgba(251,191,36,0.3)]'
                         : 'text-cyan-400/70 hover:text-cyan-200'
                     }`}
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                    <span>COSMIC ALIGNMENT (ORIGINAL)</span>
+                    <span>✨ ALIGNMENT (LIVE MOTION)</span>
                   </button>
+
+                  <button
+                    onClick={() => {
+                      cosmicAudio.playCyberKeystroke();
+                      setPlanetViewMode('orrery');
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      planetViewMode === 'orrery'
+                        ? 'bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border border-cyan-400/70 text-cyan-100 shadow-[0_0_15px_rgba(0,243,255,0.3)]'
+                        : 'text-cyan-400/70 hover:text-cyan-200'
+                    }`}
+                  >
+                    <Orbit className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>🌌 3D SOLAR ORRERY</span>
+                  </button>
+
                   <button
                     onClick={() => {
                       cosmicAudio.playCyberKeystroke();
                       setPlanetViewMode('orbit');
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       planetViewMode === 'orbit'
                         ? 'bg-cyan-500/30 border border-cyan-400/70 text-cyan-100 shadow-[0_0_15px_rgba(0,243,255,0.3)]'
                         : 'text-cyan-400/70 hover:text-cyan-200'
                     }`}
                   >
-                    <Orbit className="w-3.5 h-3.5 text-cyan-300" />
-                    <span>3D ORBIT FOCUS</span>
+                    <Eye className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>🪐 3D PLANET DOSSIER</span>
                   </button>
                 </div>
               </div>
@@ -324,14 +444,14 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setActiveTab('sudarshan')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/50 rounded-xl text-amber-200 uppercase font-bold transition-all shadow-[0_0_12px_rgba(251,191,36,0.3)]"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/50 rounded-xl text-amber-200 uppercase font-bold transition-all shadow-[0_0_12px_rgba(251,191,36,0.3)] cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                   <span>SUDARSHAN CHAKRA HUB</span>
                 </button>
                 <button
                   onClick={() => setIsDetailModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-500/40 rounded-xl text-cyan-200 uppercase font-bold transition-all shadow-[0_0_12px_rgba(0,243,255,0.2)]"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-500/40 rounded-xl text-cyan-200 uppercase font-bold transition-all shadow-[0_0_12px_rgba(0,243,255,0.2)] cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5 text-cyan-400" />
                   <span>DOSSIER: {selectedBody.name.split(' ')[0]}</span>
@@ -339,7 +459,24 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
               </div>
             </div>
 
-            {planetViewMode === 'alignment' ? (
+            {planetViewMode === 'deep-vortex' ? (
+              <DeepSpaceVortexOrrery3D
+                celestialBodies={CELESTIAL_BODIES_DATA}
+                selectedBody={selectedBody}
+                onSelectBody={(body) => {
+                  setSelectedBody(body);
+                }}
+                onEnterBlackHolePortal={() => setActiveTab('blackhole')}
+                birthEphemeris={birthEphemeris}
+                isBirthLocked={isBirthLockedMode}
+                onOpenBirthModal={() => setIsEphemerisModalOpen(true)}
+                onResetBirthAlignment={() => setIsBirthLockedMode(false)}
+                onApplyBirthEphemeris={(ephemeris) => {
+                  setBirthEphemeris(ephemeris);
+                  setIsBirthLockedMode(true);
+                }}
+              />
+            ) : planetViewMode === 'alignment' ? (
               <CosmicPlanetaryAlignmentHomepage
                 onSelectPlanet={(body) => {
                   setSelectedBody(body);
@@ -350,6 +487,23 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
                 }}
                 onOpenTab={(tabId) => setActiveTab(tabId as CyberTab)}
               />
+            ) : planetViewMode === 'orrery' ? (
+              <PlanetOrrery3D
+                celestialBodies={CELESTIAL_BODIES_DATA}
+                selectedBody={selectedBody}
+                onSelectBody={(body) => {
+                  setSelectedBody(body);
+                }}
+                onEnterBlackHolePortal={() => setActiveTab('blackhole')}
+                birthEphemeris={birthEphemeris}
+                isBirthLocked={isBirthLockedMode}
+                onOpenBirthModal={() => setIsEphemerisModalOpen(true)}
+                onResetBirthAlignment={() => setIsBirthLockedMode(false)}
+                onApplyBirthEphemeris={(ephemeris) => {
+                  setBirthEphemeris(ephemeris);
+                  setIsBirthLockedMode(true);
+                }}
+              />
             ) : (
               <CyberPlanetaryCanvas
                 selectedBody={selectedBody}
@@ -359,6 +513,13 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
                 onInitiateWarp={(body) => handleInitiateWarp(body)}
               />
             )}
+          </div>
+        )}
+
+        {/* 1.5. 3-6-9 SACRED EARTH VORTICES & GOOGLE MAPS GROUNDED RADAR */}
+        {activeTab === 'maps-radar' && (
+          <div className="space-y-6">
+            <TeslaEarthVortexMapsRadar />
           </div>
         )}
 
@@ -452,10 +613,10 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
           </div>
         )}
 
-        {/* 6. BLACK HOLE SINGULARITY PORTAL */}
+        {/* 6. BLACK HOLE SINGULARITY & TIME-DISTORTION PORTAL */}
         {activeTab === 'blackhole' && (
           <div className="space-y-6">
-            <BlackHolePortalCore />
+            <DeepSpaceSingularityCore />
           </div>
         )}
 
@@ -466,49 +627,67 @@ export const TeslaCyberPortalNexus: React.FC<TeslaCyberPortalNexusProps> = ({
           </div>
         )}
 
-        {/* 8. WARDENCLYFFE ETHER GENERATOR */}
+        {/* 8. 3-6-9 ETHER ENERGY FIELD (3D WIRELESS POWER TRANSMISSION) */}
         {activeTab === 'etheric' && (
-          <div className="bg-[#050b18]/90 border border-cyan-500/30 rounded-2xl p-6 font-mono space-y-6">
-            <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4">
-              <Compass className="w-6 h-6 text-cyan-400 animate-pulse" />
-              <div>
-                <h2 className="text-lg font-bold text-cyan-100">WARDENCLYFFE WIRELESS RADIANT ETHER TRANSMITTER</h2>
-                <p className="text-xs text-cyan-400/80">
-                  Earth resonant cavity standing wave generator (1899 Colorado Springs & 1901 Long Island blueprints).
-                </p>
-              </div>
-            </div>
+          <div className="space-y-6">
+            <TeslaEtherEnergyField3D />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
-              <div className="bg-black/50 p-4 rounded-xl border border-cyan-900/50 space-y-3">
-                <div className="text-amber-400 font-bold uppercase">[RADIANT ENERGY EQUATIONS]</div>
-                <p className="text-cyan-300/90">
-                  Tesla demonstrated that the Earth itself behaves as a giant spherical capacitor. By imparting electrical impulses at Earth fundamental resonant frequency (11.78 Hz to 7.83 Hz), standing electromagnetic waves wrap around the planet without inverse-square dissipation.
-                </p>
-                <div className="p-3 bg-cyan-950/40 rounded border border-cyan-500/30 text-cyan-200">
-                  <div className="font-bold text-cyan-400 mb-1">Etheric Constant:</div>
-                  <code>V_propagation = c * sqrt(epsilon_0 * mu_0) = 299,792 km/s</code>
+            {/* Classical Wardenclyffe Blueprint Dossier */}
+            <div className="bg-[#050b18]/90 border border-cyan-500/30 rounded-2xl p-6 font-mono space-y-6">
+              <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4">
+                <Compass className="w-6 h-6 text-cyan-400 animate-pulse" />
+                <div>
+                  <h2 className="text-lg font-bold text-cyan-100">WARDENCLYFFE WIRELESS RADIANT ETHER ARCHITECTURE</h2>
+                  <p className="text-xs text-cyan-400/80">
+                    Earth resonant cavity standing wave generator (1899 Colorado Springs & 1901 Long Island blueprints).
+                  </p>
                 </div>
               </div>
 
-              <div className="bg-black/50 p-4 rounded-xl border border-cyan-900/50 space-y-3">
-                <div className="text-cyan-400 font-bold uppercase">[LONGITUDINAL SCALAR OSCILLATIONS]</div>
-                <p className="text-cyan-300/90">
-                  Unlike transverse Hertzian radio waves which dissipate energy rapidly into space, longitudinal scalar waves compress the ether itself, enabling zero-loss wireless energy transmission and instantaneous quantum resonance.
-                </p>
-                <button
-                  onClick={() => {
-                    cosmicAudio.playSchumannResonance(6);
-                  }}
-                  className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-black font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(0,243,255,0.3)]"
-                >
-                  TRANSMIT RADIANT SCALAR WAVE (7.83 HZ)
-                </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
+                <div className="bg-black/50 p-4 rounded-xl border border-cyan-900/50 space-y-3">
+                  <div className="text-amber-400 font-bold uppercase">[RADIANT ENERGY EQUATIONS]</div>
+                  <p className="text-cyan-300/90">
+                    Tesla demonstrated that the Earth itself behaves as a giant spherical capacitor. By imparting electrical impulses at Earth fundamental resonant frequency (11.78 Hz to 7.83 Hz), standing electromagnetic waves wrap around the planet without inverse-square dissipation.
+                  </p>
+                  <div className="p-3 bg-cyan-950/40 rounded border border-cyan-500/30 text-cyan-200">
+                    <div className="font-bold text-cyan-400 mb-1">Etheric Constant:</div>
+                    <code>V_propagation = c * sqrt(epsilon_0 * mu_0) = 299,792 km/s</code>
+                  </div>
+                </div>
+
+                <div className="bg-black/50 p-4 rounded-xl border border-cyan-900/50 space-y-3">
+                  <div className="text-cyan-400 font-bold uppercase">[LONGITUDINAL SCALAR OSCILLATIONS]</div>
+                  <p className="text-cyan-300/90">
+                    Unlike transverse Hertzian radio waves which dissipate energy rapidly into space, longitudinal scalar waves compress the ether itself, enabling zero-loss wireless energy transmission and instantaneous quantum resonance.
+                  </p>
+                  <button
+                    onClick={() => {
+                      cosmicAudio.playSchumannResonance(6);
+                    }}
+                    className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-black font-bold rounded-lg text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(0,243,255,0.3)] cursor-pointer"
+                  >
+                    TRANSMIT RADIANT SCALAR WAVE (7.83 HZ)
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
       </main>
+
+      {/* Natal Planetary Ephemeris Modal (DOB & Location) */}
+      {isEphemerisModalOpen && (
+        <BirthPlanetaryEphemerisModal
+          onClose={() => setIsEphemerisModalOpen(false)}
+          onApplyEphemeris={(data) => {
+            setBirthEphemeris(data);
+            setIsBirthLockedMode(true);
+            setIsEphemerisModalOpen(false);
+          }}
+          initialData={birthEphemeris || undefined}
+        />
+      )}
     </div>
     </>
   );

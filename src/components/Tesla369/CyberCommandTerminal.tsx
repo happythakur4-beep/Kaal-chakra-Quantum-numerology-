@@ -81,6 +81,7 @@ export const CyberCommandTerminal: React.FC<CyberCommandTerminalProps> = ({
 • decalcify                 - Execute Pineal DMT decalcification & 852Hz/963Hz frequency protocol
 • overclock                 - Synchronize 7-Chakra biofield harmonic array
 • schumann                  - Lock onto 7.83 Hz Earth electromagnetic heartbeat
+• radar / maps              - Launch Google Maps Grounded 3-6-9 Sacred Earth Vortices Radar
 • wealth                    - Activate 888 Hz / 777 Hz prosperity resonance matrix
 • vault                     - Access Tune & Thrive classified frequency vault
 • clear                     - Flush terminal buffer`
@@ -181,6 +182,21 @@ export const CyberCommandTerminal: React.FC<CyberCommandTerminalProps> = ({
         if (onSelectTab) onSelectTab('tune-thrive');
         break;
 
+      case 'radar':
+      case 'maps':
+      case 'vortices':
+      case 'earth':
+        addLog(
+          'success',
+          `[3-6-9 SACRED EARTH VORTEX & GOOGLE MAPS RADAR ENGAGED]
+• Interrogating global dodecahedral geomagnetic grid
+• Grounding live GPS coordinates with gemini-3.5-flash
+• Launching Google Maps Radar Portal...`
+        );
+        cosmicAudio.playCyberScan();
+        if (onSelectTab) onSelectTab('maps-radar');
+        break;
+
       case 'clear':
       case 'cls':
         setLogs([]);
@@ -214,6 +230,7 @@ export const CyberCommandTerminal: React.FC<CyberCommandTerminalProps> = ({
       <div className="flex items-center gap-2 p-2 bg-[#020617] border-b border-cyan-900/40 overflow-x-auto no-scrollbar">
         <span className="text-[10px] uppercase text-cyan-500 font-bold px-1">QUICK MACROS:</span>
         {[
+          { label: '🌍 MAPS RADAR', cmd: 'radar' },
           { label: 'SCAN EARTH', cmd: 'scan earth' },
           { label: 'SCAN MARS', cmd: 'scan mars' },
           { label: 'SCAN SATURN', cmd: 'scan saturn' },

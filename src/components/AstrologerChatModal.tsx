@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ThemeMode } from '../types';
 import { AI_ASTROLOGERS_LIST, AIAstrologer } from '../data/astroSageDirectory';
+import { astrologerOfflineCache } from '../utils/astrologerOfflineCache';
 import { 
   X, 
   Send, 
@@ -14,7 +15,9 @@ import {
   VolumeX, 
   RotateCcw,
   Languages,
-  Clock
+  Clock,
+  WifiOff,
+  Database
 } from 'lucide-react';
 import { cosmicAudio } from '../utils/audioSynthesizer';
 import confetti from 'canvas-confetti';
@@ -31,6 +34,7 @@ interface ChatMessage {
   sender: 'user' | 'astrologer';
   text: string;
   timestamp: string;
+  isOfflineQueued?: boolean;
 }
 
 export const AstrologerChatModal: React.FC<AstrologerChatModalProps> = ({
@@ -40,21 +44,35 @@ export const AstrologerChatModal: React.FC<AstrologerChatModalProps> = ({
   initialAstrologerId
 }) => {
   const [selectedAstrologer, setSelectedAstrologer] = useState<AIAstrologer>(() => {
-    const found = AI_ASTROLOGERS_LIST.find(a => a.id === initialAstrologerId);
-    return found || AI_ASTROLOGERS_LIST[0];
+    const list = astrologerOfflineCache.getAstrologers();
+    const found = list.find(a => a.id === initialAstrologerId) || AI_ASTROLOGERS_LIST.find(a => a.id === initialAstrologerId);
+    return (found as AIAstrologer) || AI_ASTROLOGERS_LIST[0];
   });
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [isOfflineMode, setIsOfflineMode] = useState<boolean>(() => !navigator.onLine);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isDark = theme === 'dark';
 
   useEffect(() => {
+    const handleOnline = () => setIsOfflineMode(false);
+    const handleOffline = () => setIsOfflineMode(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
     if (initialAstrologerId) {
-      const found = AI_ASTROLOGERS_LIST.find(a => a.id === initialAstrologerId);
-      if (found) setSelectedAstrologer(found);
+      const list = astrologerOfflineCache.getAstrologers();
+      const found = list.find(a => a.id === initialAstrologerId) || AI_ASTROLOGERS_LIST.find(a => a.id === initialAstrologerId);
+      if (found) setSelectedAstrologer(found as AIAstrologer);
     }
   }, [initialAstrologerId]);
 
@@ -106,7 +124,12 @@ export const AstrologerChatModal: React.FC<AstrologerChatModalProps> = ({
       try { cosmicAudio.playFrequency(432); } catch {}
     }
 
-    // Generate authentic Vedic response based on the Astrologer's expertise
+    if (isOfflineMode) {
+      // Record to offline cache queue
+      astrologerOfflineCache.queueOfflineQuery(selectedAstrologer.id, selectedAstrologer.name, text);
+    }
+
+    // Generate authentic Vedic response based on the Astrologer's expertise (built-in offline/online engine)
     setTimeout(() => {
       let replyText = '';
       const lower = text.toLowerCase();
@@ -125,11 +148,16 @@ export const AstrologerChatModal: React.FC<AstrologerChatModalProps> = ({
         replyText = `आयुष्मान भव! आपके प्रश्न "${text}" के संदर्भ में वैदिक ज्योतिष का स्पष्ट संदेश है कि आपके ग्रह चक्र में सकारात्मक परिवर्तन आरंभ हो चुका है। अपने कर्म को निष्ठापूर्वक करें। प्रातःकाल सूर्य देव को तांबे के लोटे से अर्घ्य दें और 'ॐ सूर्याय नमः' का 11 बार उच्चारण करें। शीघ्र ही मनोवांछित फल प्राप्त होगा।`;
       }
 
+      if (isOfflineMode) {
+        replyText += `\n\n[⚡ ऑफ़लाइन कैश परामर्श: आपका प्रश्न स्थानीय रूप से सुरक्षित हो गया है और कनेक्शन लौटते ही ज्योतिषी कक्ष में स्वतः सिंक हो जाएगा।]`;
+      }
+
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'astrologer',
         text: replyText,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isOfflineQueued: isOfflineMode
       };
 
       setMessages(prev => [...prev, botMsg]);
@@ -164,22 +192,49 @@ export const AstrologerChatModal: React.FC<AstrologerChatModalProps> = ({
               <img 
                 src={selectedAstrologer.avatar} 
                 alt={selectedAstrologer.name} 
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
                 className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
               />
-              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" />
+              <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5 items-center justify-center">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white" />
+              </span>
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-base font-cinzel font-bold tracking-wide">
                   {selectedAstrologer.name} ({selectedAstrologer.hindiName})
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40">
-                  Online
-                </span>
+                {isOfflineMode ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-amber-950/90 text-amber-200 border border-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.4)]">
+                    <WifiOff className="w-2.5 h-2.5 text-amber-300" />
+                    Offline (Cached Profile)
+                  </span>
+                ) : selectedAstrologer.isOccupied ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-amber-950/90 text-amber-200 border border-amber-400/80 shadow-[0_0_12px_rgba(245,158,11,0.5)] ring-1 ring-amber-400/40 animate-pulse">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-80" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.9)]" />
+                    </span>
+                    <Clock className="w-2.5 h-2.5 text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
+                    Est. Wait: ~{selectedAstrologer.estimatedWaitTimeMin ?? 4}m
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/30 text-emerald-100 border border-emerald-400/50 shadow-[0_0_8px_rgba(16,185,129,0.35)]">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                    </span>
+                    LIVE
+                  </span>
+                )}
               </div>
               <p className="text-xs font-serif text-amber-100 opacity-90">
-                {selectedAstrologer.title} • {selectedAstrologer.experienceYears} Yrs Exp • ₹{selectedAstrologer.ratePerMin}/min (Free Preview)
+                {selectedAstrologer.title} • {selectedAstrologer.experienceYears} Yrs Exp • ₹{selectedAstrologer.ratePerMin}/min
+                {selectedAstrologer.isOccupied && ` • (${selectedAstrologer.activeQueueCount || 2} seekers in queue)`}
               </p>
             </div>
           </div>

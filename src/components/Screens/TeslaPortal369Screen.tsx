@@ -7,6 +7,7 @@ import { DeepPortalViewer } from '../Tesla369/DeepPortalViewer';
 import { BlackHolePortalCore } from '../Tesla369/BlackHolePortalCore';
 import { TeslaVortexModal } from '../Tesla369/TeslaVortexModal';
 import { TuneAndThrivePortal } from '../Tesla369/TuneAndThrivePortal';
+import { HubbleGalaxiesPortal } from '../Tesla369/HubbleGalaxiesPortal';
 import { cosmicAudio } from '../../utils/audioSynthesizer';
 import {
   Sparkles,
@@ -21,6 +22,7 @@ import {
   RefreshCw,
   Eye,
   Activity,
+  Telescope,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
@@ -31,7 +33,7 @@ interface TeslaPortal369ScreenProps {
   onTriggerBlackHoleWarp?: () => void;
 }
 
-type PortalViewTab = 'animated-universe' | 'tune-thrive' | 'blackhole' | 'vortex' | 'frequencies' | 'etheric' | 'calculator';
+type PortalViewTab = 'animated-universe' | 'hubble-galaxies' | 'tune-thrive' | 'blackhole' | 'vortex' | 'frequencies' | 'etheric' | 'calculator';
 
 export const TeslaPortal369Screen: React.FC<TeslaPortal369ScreenProps> = ({
   theme,
@@ -96,6 +98,7 @@ export const TeslaPortal369Screen: React.FC<TeslaPortal369ScreenProps> = ({
         <DeepPortalViewer
           body={selectedBody}
           allBodies={CELESTIAL_BODIES_DATA}
+          user={user}
           onClose={() => setSelectedBody(null)}
           onTravelTo={(target) => handleInitiateSpaceTravel(target)}
         />
@@ -106,6 +109,7 @@ export const TeslaPortal369Screen: React.FC<TeslaPortal369ScreenProps> = ({
         <TeslaVortexModal
           node={selectedVortexNode}
           onClose={() => setSelectedVortexNode(null)}
+          onSelectNode={(node) => setSelectedVortexNode(node)}
         />
       )}
 
@@ -113,6 +117,7 @@ export const TeslaPortal369Screen: React.FC<TeslaPortal369ScreenProps> = ({
       <div className="flex items-center justify-center sm:justify-start gap-2 border-b border-amber-500/20 pb-3 overflow-x-auto no-scrollbar">
         {[
           { id: 'animated-universe', label: '🌌 Full-Screen Animated Universe', icon: <Orbit className="w-4 h-4" /> },
+          { id: 'hubble-galaxies', label: '🔭 Hubble Galaxies Focus (NASA PDF)', icon: <Telescope className="w-4 h-4 text-cyan-400" /> },
           { id: 'tune-thrive', label: '✨ Tune & Thrive Frequency Archive', icon: <Sparkles className="w-4 h-4 text-[#ffd700]" /> },
           { id: 'blackhole', label: '🕳️ Black Hole Singularity Portal', icon: <Compass className="w-4 h-4" /> },
           { id: 'vortex', label: '⚡ 3-6-9 Tesla Vortex Matrix', icon: <Zap className="w-4 h-4" /> },
@@ -141,6 +146,16 @@ export const TeslaPortal369Screen: React.FC<TeslaPortal369ScreenProps> = ({
           <AnimatedCosmicUniversePortal
             theme={theme}
             onEnterBlackHoleWarp={() => setActiveTab('blackhole')}
+          />
+        </div>
+      )}
+
+      {/* 2. HUBBLE FOCUS: GALAXIES THROUGH SPACE AND TIME (NASA PDF VAULT) */}
+      {activeTab === 'hubble-galaxies' && (
+        <div className="space-y-6">
+          <HubbleGalaxiesPortal
+            theme={theme}
+            onNavigateToBlackHole={() => setActiveTab('blackhole')}
           />
         </div>
       )}

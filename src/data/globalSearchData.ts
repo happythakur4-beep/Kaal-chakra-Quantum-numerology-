@@ -2,7 +2,7 @@ import { ScreenType } from '../types';
 import { ALL_COURSES, INITIAL_CONSULTATIONS } from './mockData';
 import { AI_ASTROLOGERS_LIST, ASTROSAGE_HOME_GRID_TILES } from './astroSageDirectory';
 
-export type SearchCategoryType = 'engine' | 'course' | 'consultation' | 'astrosage' | 'action';
+export type SearchCategoryType = 'master' | 'engine' | 'tool' | 'course' | 'consultation' | 'astrosage' | 'action';
 
 export interface SearchResultItem {
   id: string;
@@ -19,45 +19,271 @@ export interface SearchResultItem {
   actionType: 'navigate' | 'course' | 'astrologer' | 'feature_modal' | 'report_modal';
   payload?: any;
   badge?: string;
+  isMasterShastra?: boolean;
+  code?: string;
 }
 
 export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
-  // 1. Core Occult Engines & Primary Features
+  // ==========================================
+  // 🌟 THE 9 MASTER SHASTRA PORTALS 🌟
+  // ==========================================
   {
-    id: 'feat-kundli',
-    title: 'Janam Kundli (Birth Chart)',
-    hindiTitle: 'जन्म कुंडली एवं लग्न चक्र',
-    subtitle: 'Vedic Horoscope & Planetary Longitudes',
-    category: 'engine',
-    categoryLabel: 'Sacred Vedic Engine',
-    iconName: 'Compass',
-    iconColor: 'text-orange-400',
-    keywords: ['kundli', 'birth chart', 'horoscope', 'lagna', 'ascendant', 'navamsha', 'd9', 'shodashvarga', 'dasha', 'vimshottari', 'graha', 'bhavas', 'sarvashtakvarga', 'kundali'],
-    description: 'Calculate precision Vedic Lagna, Navamsha (D9), Shodashvarga divisional charts, Vimshottari Mahadasha timeline, and Sarvashtakvarga points.',
-    targetScreen: 'kundli',
+    id: 'master-gita-confession',
+    title: 'Gita Sin Confession & Prayashchitta Sanctum',
+    hindiTitle: 'श्रीमद्भगवद्गीता महापाप स्वीकारोक्ति एवं प्रायश्चित्त मण्डप',
+    subtitle: 'Sacred Altar, 14 Great Sins Penal Decree & Agni Fire Dissolution',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Flame',
+    iconColor: 'text-amber-400',
+    isMasterShastra: true,
+    code: 'GITA-00',
+    keywords: [
+      'gita', 'confession', 'prayashchitta', 'sin', 'sins', 'karma', 'pap', 'papa', 'moksha',
+      'bhagavad gita', '14 sins', 'penal decree', 'agni', 'fire dissolution', 'altar',
+      'repentance', 'redemption', 'shuddhi', 'karmic debt', '21 day vow', 'shloka', 'krishna',
+      'paap mukti', 'confess', 'prayaschita', 'shanti'
+    ],
+    description: 'Consecrated altar based on BG 9.30 & 18.66 with the 14 Great Sins penal decree, interactive Agni fire dissolution ritual, and 21-day redemptive vow matrix.',
+    targetScreen: 'karma',
     actionType: 'navigate',
-    badge: 'Core Engine'
+    badge: 'Master Shastra'
   },
   {
-    id: 'feat-matching',
-    title: 'Kundli Milan (Horoscope Matching)',
-    hindiTitle: 'कुंडली मिलान एवं अष्टकूट गुण',
-    subtitle: '36 Guna Ashtakoota & Mangal Dosha Compatibility',
-    category: 'engine',
-    categoryLabel: 'Sacred Vedic Engine',
+    id: 'master-mind-healing',
+    title: 'Mind-Over-Illness: Cellular Epigenetics & Bio-Resonance',
+    hindiTitle: 'चित्त रोग मुक्ति • मानसिक स्वास्थ्य एवं कायाकल्प',
+    subtitle: 'Control Mind & Eliminate Any Illness via Epigenetics & Bio-Photons',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Brain',
+    iconColor: 'text-emerald-400',
+    isMasterShastra: true,
+    code: 'MED-01',
+    keywords: [
+      'mind healing', 'cellular healing', 'epigenetics', 'illness', 'disease', 'cure', 'heal body',
+      'cancer', 'diabetes', 'blood pressure', 'migraine', 'arthritis', 'anxiety', 'autoimmune',
+      'thyroid', 'asthma', 'gut', 'ibs', 'vagus nerve', 'biofield', 'solfeggio', '528hz', '432hz',
+      'rog mukti', 'dhanvantari', 'subconscious mind', 'bio-photons', 'cellular laser', 'healing'
+    ],
+    description: 'Empower subconscious biofield commands to regenerate tissues, lower systemic inflammation, stimulate vagal tone, and dissolve disease with 528Hz Solfeggio laser projection.',
+    targetScreen: 'mind-healing',
+    actionType: 'navigate',
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'master-memory-hypnosis',
+    title: 'Memory Reconsolidation Hypnosis Chamber',
+    hindiTitle: 'स्मृति शोधन एवं हिप्नोसिस • ३D ब्रेन सिमुलेशन',
+    subtitle: 'Neuro-Synaptic Decoupling, Trauma Dimmer & Roman Memory Palace',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Zap',
+    iconColor: 'text-cyan-400',
+    isMasterShastra: true,
+    code: 'NEURO-02',
+    keywords: [
+      'memory hypnosis', 'hypnosis', 'memory reconsolidation', 'trauma', 'brain simulator',
+      '3d brain', 'submodalities', 'memory palace', 'synaptic decoupling', 'ptsd', 'fear',
+      'phobia', 'mental block', 'theta waves', 'binaural beats', 'trance', 'neuroscience',
+      'sammohana', 'smriti shodhan'
+    ],
+    description: 'Extinguish traumatic memory triggers, dial down amygdala submodalities, and construct multi-hall Roman Memory Palaces using interactive 3D brain simulations and guided audio hypnosis.',
+    targetScreen: 'memory-hypnosis',
+    actionType: 'navigate',
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'master-kundli-shodashvarga',
+    title: 'Precision Lagna & Janam Kundli D1-D60',
+    hindiTitle: 'जन्म लग्न कुंडली, नवमांश (D9) एवं षोडशवर्ग चक्र',
+    subtitle: 'Vedic Horoscope, 16 Divisional Charts & 337 Sarvashtakvarga',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Compass',
+    iconColor: 'text-amber-400',
+    isMasterShastra: true,
+    code: 'VEDIC-03',
+    keywords: [
+      'kundli', 'janam kundli', 'birth chart', 'horoscope', 'lagna', 'ascendant', 'navamsha', 'd9',
+      'shodashvarga', 'd1', 'd10', 'd60', 'dashamsha', 'sarvashtakvarga', 'vimshottari', 'dasha',
+      'planetary longitudes', 'bhavas', 'graha', 'yogas', 'kundali', 'vedic chart'
+    ],
+    description: 'Mathematical ascendant calculations, 16 divisional charts, 337 Sarvashtakvarga points, and 120-year Vimshottari Mahadasha timeline with astrological strength metrics.',
+    targetScreen: 'kundli',
+    actionType: 'navigate',
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'master-matching-vivah',
+    title: 'Ashtakoota 36 Guna Milan & Vivah Sanskar',
+    hindiTitle: 'अष्टकूट ३६ गुण मिलान एवं संबंध सामंजस्य',
+    subtitle: '36 Guna Compatibility, Nadi, Bhakoot & Mangal Dosha Filter',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
     iconName: 'Heart',
     iconColor: 'text-rose-400',
-    keywords: ['matching', 'milan', 'guna', 'gun milan', 'ashtakoota', 'marriage', 'vivah', 'nadi', 'bhakoot', 'gana', 'mangal dosha', 'compatibility', 'synastry'],
-    description: '36 Guna Ashtakoota Milan analysis with Nadi, Bhakoot, Gana scores, and mutual Mangal Dosha cancellation exceptions.',
+    isMasterShastra: true,
+    code: 'VIVAH-04',
+    keywords: [
+      'kundli milan', 'matching', 'gun milan', '36 gunas', 'ashtakoota', 'marriage', 'vivah',
+      'nadi dosha', 'bhakoot', 'gana', 'mangal dosha', 'manglik', 'compatibility', 'synastry',
+      'rajju', 'vedha', 'vivah sanskar', 'horoscope matching'
+    ],
+    description: '36 Guna Ashtakoota Milan analysis with Nadi, Bhakoot, Gana scores, and mutual Mangal Dosha cancellation exceptions with astrological remedies.',
     targetScreen: 'matching',
     actionType: 'navigate',
-    badge: '36 Gunas'
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'master-prashnavali-oracle',
+    title: 'Ramcharitmanas Chaupai 15x15 Oracle & KP Horary',
+    hindiTitle: 'श्री रामचरितमानस प्रश्नावली एवं के.पी. होरारी',
+    subtitle: 'Sacred 15x15 Letter Matrix & Krishnamurti Paddhati 1-249',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Scroll',
+    iconColor: 'text-orange-400',
+    isMasterShastra: true,
+    code: 'ORACLE-05',
+    keywords: [
+      'prashnavali', 'ramcharitmanas', 'ram shalaka', 'oracle', 'chaupai', 'tulsidas', 'horary',
+      'kp 1-249', 'question', 'divination', 'ramayan', 'prashna', 'divine guidance', 'instant answer'
+    ],
+    description: 'Consult the consecrated 15x15 letter grid to receive instant poetic verdicts from Goswami Tulsidas’s Ramcharitmanas, combined with KP 1-249 Sub-Lord horary analysis.',
+    targetScreen: 'prashnavali',
+    actionType: 'navigate',
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'master-loshu-numerology',
+    title: 'Lo Shu 3x3 Magic Grid & 8 Cosmic Raj Yogas',
+    hindiTitle: 'अंक ज्योतिष, ३x३ लो शू ग्रिड एवं ८ राजयोग',
+    subtitle: 'Mulank, Bhagyank, Golden (4-5-6), Silver (2-5-8) & Name Correction',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Calculator',
+    iconColor: 'text-emerald-400',
+    isMasterShastra: true,
+    code: 'NUM-06',
+    keywords: [
+      'lo shu', 'loshu', 'numerology', 'ank jyotish', '3x3 grid', 'magic square', 'mulank',
+      'bhagyank', 'driver', 'conductor', 'raj yoga', 'golden plane', 'silver plane',
+      'name numerology', 'chaldean', 'pythagorean', 'missing numbers', 'karmic numbers'
+    ],
+    description: 'Calculate Mulank (Driver), Bhagyank (Conductor), Name vibration, and 3x3 Lo Shu Magic Grid planes with full remedy activations for missing numbers.',
+    targetScreen: 'numerology',
+    actionType: 'navigate',
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'master-vastu-16zone',
+    title: 'MahaVastu 16-Zone Cosmic Energy Grid',
+    hindiTitle: '१६ महावास्तु दिशाएं एवं पंचतत्व संतुलन',
+    subtitle: '16 Compass Zones, 5 Elements & 32 Main Door Entrance Padas',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Grid',
+    iconColor: 'text-cyan-400',
+    isMasterShastra: true,
+    code: 'VASTU-07',
+    keywords: [
+      'vastu', 'mahavastu', '16 zones', 'compass', 'panchatatva', 'five elements', 'north east',
+      'ishanya', 'south east', 'agneya', 'nairutya', 'vayavya', '32 entrances', 'padas',
+      'home vastu', 'office vastu', 'color strips', 'metal remedies', 'spatial energy'
+    ],
+    description: 'Interactive 16-zone Vastu Compass analyzing Ishanya (NE), Agneya (SE), Nairutya (SW), and Vayavya (NW) with non-demolition color, tape, and pyramid cures.',
+    targetScreen: 'vastu',
+    actionType: 'navigate',
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'master-tesla-369-nexus',
+    title: 'Nikola Tesla 3-6-9 Vortex Energy Nexus & Cosmic Orrery',
+    hindiTitle: 'निकोला टेस्ला ३-६-९ ब्रह्मांडीय ऊर्जा महाद्वार',
+    subtitle: 'Toroidal Vortex Keys, Black Hole Warp & Hans Cousto Cosmic Octave',
+    category: 'master',
+    categoryLabel: 'Master Shastra Sanctum',
+    iconName: 'Zap',
+    iconColor: 'text-purple-400',
+    isMasterShastra: true,
+    code: 'TESLA-08',
+    keywords: [
+      'tesla', '369', 'nikola tesla', 'vortex math', 'black hole', 'warp', 'toroid', 'orrery',
+      'planets', 'galaxies', 'cousto', 'cosmic octave', 'solfeggio', 'manifestation', 'frequency',
+      'akasha', 'wardenclyffe', 'quantum nexus', 'hubble', 'nasa', 'andromeda', 'gn-z11', 'lensing'
+    ],
+    description: 'Enter the 369 Tesla Portal through a relativistic black hole warp to explore planetary acoustics, NASA Hubble deep galaxies, Hans Cousto Cosmic Octaves, and 3-6-9 vortex math.',
+    targetScreen: 'tesla-369',
+    actionType: 'navigate',
+    badge: 'Master Shastra'
+  },
+  {
+    id: 'feat-hubble-galaxies-vault',
+    title: 'NASA Hubble Focus: Galaxies Through Space and Time',
+    hindiTitle: 'नासा हबल महा-आकाशगंगा वेधशाला (Hubble Space Focus)',
+    subtitle: 'Galactic Collisions, 13.4 Billion Light-Years, Gravitational Lensing & Relic Galaxies',
+    category: 'engine',
+    categoryLabel: 'Cosmic Astronomy Vault',
+    iconName: 'Orbit',
+    iconColor: 'text-cyan-400',
+    keywords: [
+      'hubble', 'galaxies', 'nasa', 'esa', 'andromeda', 'm31', 'gn-z11', 'smith cloud', 'bedin 1',
+      'kiso 5639', 'ngc 1277', 'markarian 231', 'gravitational lensing', 'einstein ring', 'deep field',
+      'hudf', 'macs 2129-1', 'spt0615-jd', 'space and time', 'cosmic timeline'
+    ],
+    description: 'Explore the complete NASA Hubble Focus e-book discoveries: Andromeda PHAT survey, 4B-year galactic collisions, ancient fossils, binary black holes, and 13.4-billion-year-old cosmic frontier galaxies.',
+    targetScreen: 'tesla-369',
+    actionType: 'navigate',
+    badge: 'NASA Hubble Focus'
+  },
+
+  // ==========================================
+  // 🔮 CORE OCCULT ENGINES & FEATURES 🔮
+  // ==========================================
+  {
+    id: 'feat-sound-healing',
+    title: 'Sound Healing Suite & Tibetan Singing Bowls',
+    hindiTitle: 'ध्वनि चिकित्सा एवं तिब्बती कटोरा साधना',
+    subtitle: 'Chakra Frequencies, Binaural Beats, 432Hz & 528Hz Solfeggio',
+    category: 'engine',
+    categoryLabel: 'Sacred Acoustic Suite',
+    iconName: 'Disc',
+    iconColor: 'text-amber-300',
+    keywords: [
+      'sound healing', 'tibetan bowl', 'singing bowls', 'solfeggio', '432hz', '528hz', 'binaural beats',
+      'chakra frequencies', 'sound bath', 'sound therapy', 'nada yoga', 'om chant', 'acoustic healing',
+      'frequency generator', 'meditation sound'
+    ],
+    description: 'Immersive sound healing engine featuring 3D interactive Tibetan singing bowls, Solfeggio resonant harmonics, 7 chakra crystal bowls, and binaural brainwave synchronizers.',
+    targetScreen: 'sound-healing',
+    actionType: 'navigate',
+    badge: '3D Acoustic'
+  },
+  {
+    id: 'feat-energy-balance',
+    title: 'Energy & Balance: Sudarshan Matrix & 49 Marma Points',
+    hindiTitle: 'ऊर्जा सन्तुलन • सुदर्शन चक्र एवं ४९ मर्म बिंदु',
+    subtitle: 'Nadi Calibration, Prana Flow Balancing & Bio-Energetic Harmonization',
+    category: 'engine',
+    categoryLabel: 'Bio-Energetic Matrix',
+    iconName: 'SlidersHorizontal',
+    iconColor: 'text-yellow-400',
+    keywords: [
+      'energy balance', 'sudarshan matrix', 'marma points', '49 marma', 'prana', 'nadi', 'ida',
+      'pingala', 'sushumna', 'biofield', 'chakra balance', 'kundalini', 'aura cleansing',
+      'vital energy', 'urja santulan'
+    ],
+    description: 'Balance the subtle energy field using the Sacred Sudarshan Yantra, 49 Marma point calibrations, and bilateral Pranic flow alignments.',
+    targetScreen: 'energy-balance',
+    actionType: 'navigate',
+    badge: '49 Marma Points'
   },
   {
     id: 'feat-panchang',
     title: 'Aaj Ka Panchang & Shubh Muhurat',
     hindiTitle: 'दैनिक पंचांग, शुभ मुहूर्त एवं चौघड़िया',
-    subtitle: 'Tithi, Nakshatra, Yoga, Karana & Choghadiya',
+    subtitle: 'Tithi, Nakshatra, Yoga, Karana & Planetary Horas',
     category: 'engine',
     categoryLabel: 'Sacred Vedic Engine',
     iconName: 'Calendar',
@@ -82,81 +308,6 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     targetScreen: 'rashifal',
     actionType: 'navigate',
     badge: '2026 Forecast'
-  },
-  {
-    id: 'feat-numerology',
-    title: 'Ank Jyotish & Lo Shu 3x3 Magic Grid',
-    hindiTitle: 'अंक ज्योतिष एवं लो शू ग्रिड',
-    subtitle: 'Mulank, Bhagyank, Name Numerology & 8 Raj Yogas',
-    category: 'engine',
-    categoryLabel: 'Sacred Vedic Engine',
-    iconName: 'Calculator',
-    iconColor: 'text-emerald-400',
-    keywords: ['numerology', 'ank jyotish', 'lo shu', 'loshu', 'mulank', 'bhagyank', 'life path', 'raj yoga', 'magic square', 'name numerology', 'driver', 'conductor', 'numbers'],
-    description: 'Calculate Mulank (Driver), Bhagyank (Conductor), Name vibration, and 3x3 Lo Shu Magic Grid planes (Golden 4-5-6, Silver 2-5-8, Thought, Will, Action).',
-    targetScreen: 'numerology',
-    actionType: 'navigate',
-    badge: 'Lo Shu 3x3'
-  },
-  {
-    id: 'feat-vastu',
-    title: 'Vastu Shastra Compass & Spatial Energy',
-    hindiTitle: 'वास्तु शास्त्र दिशा चक्र एवं पंचतत्व',
-    subtitle: '16 Compass Zones & Five Element Balancing',
-    category: 'engine',
-    categoryLabel: 'Sacred Vedic Engine',
-    iconName: 'Grid',
-    iconColor: 'text-cyan-400',
-    keywords: ['vastu', 'vastu shastra', 'compass', 'direction', 'north east', 'ishanya', 'south east', 'agneya', 'spatial energy', 'panchatatva', 'home vastu', 'office vastu', 'remedies'],
-    description: 'Interactive 16-zone Vastu Compass analyzing Ishanya (NE), Agneya (SE), Nairutya (SW), and Vayavya (NW) with non-demolition color and metal remedies.',
-    targetScreen: 'vastu',
-    actionType: 'navigate',
-    badge: '16 Zones'
-  },
-  {
-    id: 'feat-prashnavali',
-    title: 'Ramcharitmanas Chaupai Prashnavali',
-    hindiTitle: 'श्री रामशलाका प्रश्नावली',
-    subtitle: '15x15 Sacred Letter Matrix & Goswami Tulsidas Oracle',
-    category: 'engine',
-    categoryLabel: 'Sacred Vedic Engine',
-    iconName: 'Scroll',
-    iconColor: 'text-yellow-400',
-    keywords: ['prashnavali', 'ramcharitmanas', 'ram shalaka', 'oracle', 'chaupai', 'tulsidas', 'question', 'horary', 'divination', 'ramayan'],
-    description: 'Consult the consecrated 15x15 letter grid to receive instant poetic guidance and auspicious verdicts from Goswami Tulsidas’s Ramcharitmanas.',
-    targetScreen: 'prashnavali',
-    actionType: 'navigate',
-    badge: 'Divine Oracle'
-  },
-  {
-    id: 'feat-baby-names',
-    title: 'Naamkaran Sanskar & Baby Names',
-    hindiTitle: 'नामकरण संस्कार एवं नक्षत्र नामाक्षर',
-    subtitle: 'Nakshatra Starting Letters & Vedic Numerology',
-    category: 'engine',
-    categoryLabel: 'Sacred Vedic Engine',
-    iconName: 'Baby',
-    iconColor: 'text-pink-400',
-    keywords: ['baby names', 'naamkaran', 'naming', 'nakshatra names', 'starting letters', 'syllables', 'padas', 'vedic names', 'boy names', 'girl names', 'numerology name'],
-    description: 'Generate sacred Vedic baby names filtered by birth Moon Nakshatra quarter (Pada) syllables, Rashi, and auspicious numerological compound values.',
-    targetScreen: 'baby-names',
-    actionType: 'navigate',
-    badge: 'Nakshatra Syllables'
-  },
-  {
-    id: 'feat-japa-mala',
-    title: 'Quantum Japa Mala & Mantra Counter',
-    hindiTitle: 'जाप माला एवं मंत्र साधना',
-    subtitle: '108 Sacred Beads & Solfeggio Harmonic Chanting',
-    category: 'engine',
-    categoryLabel: 'Sacred Vedic Engine',
-    iconName: 'Disc',
-    iconColor: 'text-purple-400',
-    keywords: ['japa', 'mala', 'mantra', 'chanting', '108', 'beads', 'om namah shivaya', 'gayatri mantra', 'maha mrityunjaya', 'hare krishna', 'meditation', 'counter'],
-    description: 'Interactive 108-bead Japa Mala counter with authentic Solfeggio sound resonances (432Hz, 528Hz), Meru bead turnaround, and mantra vibration logs.',
-    targetScreen: 'japa-mala',
-    actionType: 'navigate',
-    badge: '108 Beads'
   },
   {
     id: 'feat-lalkitab',
@@ -212,26 +363,41 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     categoryLabel: 'Sacred Vedic Engine',
     iconName: 'Gem',
     iconColor: 'text-emerald-300',
-    keywords: ['gemstones', 'ratna', 'rudraksha', 'ruby', 'pearl', 'yellow sapphire', 'blue sapphire', 'emerald', 'diamond', 'coral', 'gomed', 'cat eye', 'pukhraj', 'manik', 'panna', 'neelam'],
+    keywords: ['gemstones', 'ratna', 'rudraksha', 'ruby', 'pearl', 'yellow sapphire', 'blue sapphire', 'emerald', 'diamond', 'coral', 'gomed', 'cat eye', 'pukhraj', 'manik', 'panna', 'neelam', 'mukhi rudraksha'],
     description: 'Personalized gemstone recommendations based on Lagna Lord, 5th, and 9th houses with consecration rituals, wearing fingers, and compatible metals.',
     targetScreen: 'gemstones',
     actionType: 'navigate',
     badge: 'Ratna Upay'
   },
   {
-    id: 'feat-tesla-369',
-    title: '369 Tesla Portal (Cosmic Vortex & Celestial Orrery)',
-    hindiTitle: '३६९ टेस्ला पोर्टल एवं ब्रह्मांडीय ग्रह चक्र',
-    subtitle: 'Planets, Galaxies, Black Hole Warp & 3-6-9 Vortex Math',
+    id: 'feat-baby-names',
+    title: 'Naamkaran Sanskar & Baby Names',
+    hindiTitle: 'नामकरण संस्कार एवं नक्षत्र नामाक्षर',
+    subtitle: 'Nakshatra Starting Letters & Vedic Numerology',
     category: 'engine',
-    categoryLabel: 'Quantum Celestial Portal',
-    iconName: 'Zap',
-    iconColor: 'text-[#ffd700]',
-    keywords: ['tesla', '369', 'portal', 'tesla portal', 'black hole', 'warp', 'planets', 'galaxies', 'universe', 'solfeggio', 'vortex', 'celestial', 'frequency', 'akasha', 'wardenclyffe', 'cousto'],
-    description: 'Enter the 369 Tesla Portal through a relativistic black hole warp to explore planetary acoustics, deep galaxies, Hans Cousto Cosmic Octave, and 3-6-9 vortex math.',
-    targetScreen: 'tesla-369',
+    categoryLabel: 'Sacred Vedic Engine',
+    iconName: 'Baby',
+    iconColor: 'text-pink-400',
+    keywords: ['baby names', 'naamkaran', 'naming', 'nakshatra names', 'starting letters', 'syllables', 'padas', 'vedic names', 'boy names', 'girl names', 'numerology name'],
+    description: 'Generate sacred Vedic baby names filtered by birth Moon Nakshatra quarter (Pada) syllables, Rashi, and auspicious numerological compound values.',
+    targetScreen: 'baby-names',
     actionType: 'navigate',
-    badge: '3D 369 Portal'
+    badge: 'Nakshatra Syllables'
+  },
+  {
+    id: 'feat-japa-mala',
+    title: 'Quantum Japa Mala & Mantra Counter',
+    hindiTitle: 'जाप माला एवं मंत्र साधना',
+    subtitle: '108 Sacred Beads & Solfeggio Harmonic Chanting',
+    category: 'engine',
+    categoryLabel: 'Sacred Vedic Engine',
+    iconName: 'Disc',
+    iconColor: 'text-purple-400',
+    keywords: ['japa', 'mala', 'mantra', 'chanting', '108', 'beads', 'om namah shivaya', 'gayatri mantra', 'maha mrityunjaya', 'hare krishna', 'meditation', 'counter'],
+    description: 'Interactive 108-bead Japa Mala counter with authentic Solfeggio sound resonances (432Hz, 528Hz), Meru bead turnaround, and mantra vibration logs.',
+    targetScreen: 'japa-mala',
+    actionType: 'navigate',
+    badge: '108 Beads'
   },
   {
     id: 'feat-mentor',
@@ -279,7 +445,9 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     badge: 'Member Sanctum'
   },
 
-  // 2. Academy Courses (from ALL_COURSES)
+  // ==========================================
+  // 📚 ACADEMY COURSES
+  // ==========================================
   ...ALL_COURSES.map((course) => ({
     id: `course-${course.id}`,
     title: course.title,
@@ -306,7 +474,9 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     badge: `${course.lessonsCount} Lessons`
   })),
 
-  // 3. Consultations & AI Astrologers
+  // ==========================================
+  // 🔮 CONSULTATIONS & AI ASTROLOGERS
+  // ==========================================
   ...INITIAL_CONSULTATIONS.map((con) => ({
     id: `consultation-${con.id}`,
     title: con.title,
@@ -332,7 +502,7 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     badge: `₹${con.fee}`
   })),
 
-  // AI Live Astrologers
+  // Live Astrologer Gurus
   ...AI_ASTROLOGERS_LIST.map((astro) => ({
     id: `astrologer-${astro.id}`,
     title: `${astro.name} (${astro.hindiName})`,
@@ -359,7 +529,9 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     badge: `₹${astro.ratePerMin}/min`
   })),
 
-  // 4. Kaal Chakra 28 Vedic Shastra Features & Sub-Tools
+  // ==========================================
+  // 🕉️ KAAL CHAKRA 28 VEDIC SHASTRA TOOLS
+  // ==========================================
   ...ASTROSAGE_HOME_GRID_TILES.map((tile) => ({
     id: `shastra-${tile.id}`,
     title: tile.title,
@@ -387,7 +559,9 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     badge: tile.badge || `${tile.subFeatures.length} Tools`
   })),
 
-  // 5. Special Action: Unlock Destiny Report
+  // ==========================================
+  // ✨ ACTIONS & REPORTS
+  // ==========================================
   {
     id: 'action-unlock-destiny',
     title: 'Unlock Full Destiny Life Dossier',
@@ -397,7 +571,7 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
     categoryLabel: 'Interactive Service',
     iconName: 'Sparkles',
     iconColor: 'text-amber-400',
-    keywords: ['destiny report', 'unlock report', 'life dossier', 'numerology profile', 'generate report', 'birth report'],
+    keywords: ['destiny report', 'unlock report', 'life dossier', 'numerology profile', 'generate report', 'birth report', 'pdf report'],
     description: 'Instant synthesis of your Life Path, Soul Urge, Cosmic Archetype, and vocational planetary alignments.',
     targetScreen: undefined,
     actionType: 'report_modal',
@@ -406,17 +580,18 @@ export const GLOBAL_SEARCH_ITEMS: SearchResultItem[] = [
 ];
 
 export const POPULAR_SEARCH_CHIPS = [
+  { label: '🌟 Master Shastras', query: 'Master Shastra' },
+  { label: '🔥 Gita Sin Confession', query: 'Gita Confession' },
+  { label: '🧠 Mind-Over-Illness Healing', query: 'Mind Healing' },
   { label: '⚡ 369 Tesla Portal', query: 'Tesla' },
-  { label: 'Kundli Milan', query: 'Kundli Milan' },
-  { label: 'Lo Shu Grid', query: 'Lo Shu' },
-  { label: 'Dainik Rashifal', query: 'Rashifal' },
-  { label: 'Aaj Ka Panchang', query: 'Panchang' },
-  { label: 'Lal Kitab', query: 'Lal Kitab' },
-  { label: 'Ramcharitmanas Oracle', query: 'Prashnavali' },
-  { label: 'Astro-Numerology 101', query: 'Astro-Numerology' },
-  { label: 'Swami Ji', query: 'Swami Ji' },
-  { label: 'Ratna Upay', query: 'Ratna' },
-  { label: '16 Vastu Zones', query: 'Vastu' },
-  { label: 'KP Astrology', query: 'KP' },
-  { label: 'Japa Mala', query: 'Japa Mala' },
+  { label: '🌌 Memory Hypnosis', query: 'Memory Hypnosis' },
+  { label: '🪐 Janam Kundli D1-D60', query: 'Kundli' },
+  { label: '❤️ 36 Guna Kundli Milan', query: 'Kundli Milan' },
+  { label: '🔢 Lo Shu 3x3 Grid', query: 'Lo Shu' },
+  { label: '🧭 16 Vastu Zones', query: 'Vastu' },
+  { label: '📜 Ramcharitmanas Oracle', query: 'Prashnavali' },
+  { label: '🔔 Tibetan Sound Bowls', query: 'Sound Healing' },
+  { label: '📅 Aaj Ka Panchang', query: 'Panchang' },
+  { label: '📕 Lal Kitab Upay', query: 'Lal Kitab' },
+  { label: '💎 Ratna & Rudraksha', query: 'Ratna' },
 ];

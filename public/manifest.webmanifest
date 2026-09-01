@@ -1,0 +1,66 @@
+{
+  "name": "Kaal Chakra - Quantum Numerology & Vedic Astrology",
+  "short_name": "Kaal Chakra",
+  "description": "The complete Occult Science, Vedic Astrology & Tesla 369 Portal for Android",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["lifestyle", "utilities", "education", "books"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Aaj Ka Panchang",
+      "short_name": "Panchang",
+      "description": "Daily Tithi, Nakshatra, Shubh Muhurat & Choghadiya",
+      "url": "/?screen=panchang",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Janam Kundli",
+      "short_name": "Kundli",
+      "description": "Detailed Vedic Natal Birth Chart & Planetary Positions",
+      "url": "/?screen=kundli",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Karma Ledger (कर्म दर्पण)",
+      "short_name": "Karma",
+      "description": "Track good deeds (Punya), sins & atonement remedies",
+      "url": "/?screen=karma",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "369 Tesla Portal",
+      "short_name": "Tesla 369",
+      "description": "Cosmic orrery, planetary harmonics & vortex math",
+      "url": "/?screen=tesla-369",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Daivajna Guru",
+      "short_name": "AI Astrologer",
+      "description": "Instant conversational Vedic astrology mentor",
+      "url": "/?screen=mentor",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

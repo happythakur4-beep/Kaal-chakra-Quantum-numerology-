@@ -24,10 +24,18 @@ interface GemstoneRemediesScreenProps {
 export const GemstoneRemediesScreen: React.FC<GemstoneRemediesScreenProps> = ({ theme, user }) => {
   const isDark = theme === 'dark';
 
+  const [selectedLagna, setSelectedLagna] = useState('Leo (Simha)');
+  const [selectedMoonRashi, setSelectedMoonRashi] = useState('Taurus (Vrishabha)');
   const [selectedGemIndex, setSelectedGemIndex] = useState(0);
   const [isPlayingMantra, setIsPlayingMantra] = useState(false);
 
-  const recommendations = getGemstoneRecommendations('Cancer (Karka)', 'Taurus (Vrishabha)');
+  const ALL_RASHIS = [
+    'Aries (Mesha)', 'Taurus (Vrishabha)', 'Gemini (Mithuna)', 'Cancer (Karka)',
+    'Leo (Simha)', 'Virgo (Kanya)', 'Libra (Tula)', 'Scorpio (Vrischika)',
+    'Sagittarius (Dhanu)', 'Capricorn (Makara)', 'Aquarius (Kumbha)', 'Pisces (Meena)'
+  ];
+
+  const recommendations = getGemstoneRecommendations(selectedLagna, selectedMoonRashi);
   const activeGem = recommendations[selectedGemIndex] || recommendations[0];
 
   const handlePlayMantra = () => {
@@ -74,6 +82,55 @@ export const GemstoneRemediesScreen: React.FC<GemstoneRemediesScreenProps> = ({ 
         }`}>
           Vedic remedial gemstones, auspicious metals, activating Bija mantras, and finger alignments tailored to your Kundli.
         </p>
+      </div>
+
+      {/* Dynamic Kundli Sign Customizer */}
+      <div className={`p-4 sm:p-6 rounded-2xl border mb-8 flex flex-col md:flex-row items-center justify-between gap-4 transition-all ${
+        isDark ? 'glassmorphism-dark border-[#d4af37]/40 shadow-gold-soft' : 'glassmorphism-light border-[#c5a059]/50 shadow-md'
+      }`}>
+        <div className="w-full md:w-1/2">
+          <label className="block text-xs font-cinzel font-bold text-[#d4af37] mb-1.5 uppercase tracking-wider">
+            1. Select Your Ascendant / Lagna Rashi (लग्न राशि):
+          </label>
+          <select
+            value={selectedLagna}
+            onChange={(e) => {
+              setSelectedLagna(e.target.value);
+              setSelectedGemIndex(0);
+            }}
+            className={`w-full p-2.5 rounded-xl border text-xs font-cinzel font-bold transition-all ${
+              isDark 
+                ? 'bg-black/80 border-[#d4af37]/40 text-amber-200 focus:border-[#ffd700]' 
+                : 'bg-white border-[#c5a059]/60 text-[#3b2b0a] focus:border-[#c5a059]'
+            }`}
+          >
+            {ALL_RASHIS.map((r) => (
+              <option key={r} value={r} className="bg-slate-900 text-amber-200">{r}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="w-full md:w-1/2">
+          <label className="block text-xs font-cinzel font-bold text-[#d4af37] mb-1.5 uppercase tracking-wider">
+            2. Select Your Janma Moon Rashi (चन्द्र राशि):
+          </label>
+          <select
+            value={selectedMoonRashi}
+            onChange={(e) => {
+              setSelectedMoonRashi(e.target.value);
+              setSelectedGemIndex(0);
+            }}
+            className={`w-full p-2.5 rounded-xl border text-xs font-cinzel font-bold transition-all ${
+              isDark 
+                ? 'bg-black/80 border-[#d4af37]/40 text-amber-200 focus:border-[#ffd700]' 
+                : 'bg-white border-[#c5a059]/60 text-[#3b2b0a] focus:border-[#c5a059]'
+            }`}
+          >
+            {ALL_RASHIS.map((r) => (
+              <option key={r} value={r} className="bg-slate-900 text-amber-200">{r}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Gemstone Type Selector Tabs */}

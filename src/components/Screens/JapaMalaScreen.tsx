@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ThemeMode } from '../../types';
 import { SACRED_MANTRAS_DB, JapaMantraInfo } from '../../utils/astrologyEngine';
 import { cosmicAudio } from '../../utils/audioSynthesizer';
@@ -16,7 +16,9 @@ import {
   Heart,
   ShieldCheck,
   Disc,
-  Award
+  Award,
+  Music,
+  Sun
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -31,11 +33,30 @@ export const JapaMalaScreen: React.FC<JapaMalaScreenProps> = ({ theme }) => {
   const [completedRounds, setCompletedRounds] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [isAutoChanting, setIsAutoChanting] = useState<boolean>(false);
+  const [isPlayingAudioChant, setIsPlayingAudioChant] = useState<boolean>(false);
+  const audioChantRef = useRef<HTMLAudioElement | null>(null);
+
+  // Stop chant on unmount or mantra change
+  useEffect(() => {
+    return () => {
+      cosmicAudio.stopVocalChanting();
+    };
+  }, []);
+
+  const handleToggleAudioChant = () => {
+    if (isPlayingAudioChant) {
+      cosmicAudio.stopVocalChanting();
+      setIsPlayingAudioChant(false);
+    } else {
+      setIsPlayingAudioChant(true);
+      window.dispatchEvent(new CustomEvent('play-sacred-mantra', { detail: { mantraId: selectedMantra.id } }));
+    }
+  };
 
   // Sound trigger on bead tap
   const handleBeadTap = () => {
     const nextCount = currentCount + 1;
-    if (soundEnabled) {
+    if (soundEnabled && !isPlayingAudioChant) {
       try {
         cosmicAudio.playFrequency(selectedMantra.frequencyHz || 432);
       } catch {}
@@ -86,6 +107,14 @@ export const JapaMalaScreen: React.FC<JapaMalaScreenProps> = ({ theme }) => {
   return (
     <div className="relative z-10 w-full max-w-6xl mx-auto px-2 sm:px-4 lg:px-8 py-6 md:py-10">
       
+      {/* Light Theme Photo Background for JapaMala */}
+      {!isDark && (
+        <div 
+          className="fixed inset-0 z-[-1] opacity-20 mix-blend-multiply bg-cover bg-center pointer-events-none"
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=2000&auto=format&fit=crop')` }} // Zen meditation / Lotus
+        />
+      )}
+
       {/* Top Hero */}
       <div className="text-center mb-8">
         <div 
@@ -210,7 +239,20 @@ export const JapaMalaScreen: React.FC<JapaMalaScreenProps> = ({ theme }) => {
             </div>
 
             {/* Controls Bar */}
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="flex items-center justify-center flex-wrap gap-3 pt-2">
+              <button
+                onClick={handleToggleAudioChant}
+                className={`px-4 py-2 rounded-lg font-cinzel text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md ${
+                  isPlayingAudioChant
+                    ? 'bg-amber-500 text-black shadow-amber-500/40 animate-pulse'
+                    : 'bg-amber-950/80 text-amber-300 border border-amber-500/50 hover:bg-amber-900/90'
+                }`}
+                title="Play authentic mantra vocal chanting audio"
+              >
+                {isPlayingAudioChant ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
+                <span>{isPlayingAudioChant ? 'Pause Audio Chant' : 'Play Real Chant Audio (ध्वनि)'}</span>
+              </button>
+
               <button
                 onClick={() => setIsAutoChanting(!isAutoChanting)}
                 className={`px-4 py-2 rounded-lg font-cinzel text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
@@ -220,7 +262,7 @@ export const JapaMalaScreen: React.FC<JapaMalaScreenProps> = ({ theme }) => {
                 }`}
               >
                 {isAutoChanting ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                <span>{isAutoChanting ? 'Pause Auto Chanting' : 'Auto Chanting Mode'}</span>
+                <span>{isAutoChanting ? 'Pause Auto Bead' : 'Auto Bead Mode'}</span>
               </button>
 
               <button

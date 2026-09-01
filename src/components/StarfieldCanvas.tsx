@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { ThemeMode } from '../types';
+import { ThemeMode, AuraType } from '../types';
+import { AURA_PALETTES } from '../data/auraPalettes';
 
 interface StarfieldCanvasProps {
   theme: ThemeMode;
+  activeAura?: AuraType;
 }
 
 interface Star {
@@ -58,9 +60,13 @@ interface Planet {
   ringRadiusRatio?: number;
 }
 
-export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
+export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ 
+  theme,
+  activeAura = 'Calm Amber'
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDark = theme === 'dark';
+  const auraConfig = AURA_PALETTES[activeAura] || AURA_PALETTES['Calm Amber'];
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -215,6 +221,9 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
     ];
 
     const starColorsDark = [
+      auraConfig.primary,
+      auraConfig.secondary,
+      auraConfig.tertiary,
       '#ffffff',
       '#fff7db',
       '#ffd700',
@@ -228,6 +237,8 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
     ];
 
     const starColorsLight = [
+      auraConfig.primary,
+      auraConfig.secondary,
       '#8a6514',
       '#c5a059',
       '#d4af37',
@@ -258,6 +269,10 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
       }
 
       cosmicDusts = [];
+      const dustColors = isDark 
+        ? [auraConfig.primary, auraConfig.secondary, '#ffd700', '#ffffff'] 
+        : [auraConfig.primary, '#c5a059', '#d4af37'];
+
       for (let i = 0; i < dustCount; i++) {
         cosmicDusts.push({
           x: Math.random() * width,
@@ -267,7 +282,7 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
           vy: -Math.random() * 0.3 - 0.05,
           alpha: Math.random() * 0.6 + 0.2,
           baseAlpha: Math.random() * 0.6 + 0.2,
-          color: isDark ? '#ffd700' : '#c5a059',
+          color: dustColors[Math.floor(Math.random() * dustColors.length)],
         });
       }
     };
@@ -313,7 +328,7 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
       // 1. Draw Subtle Constellation Lines
       if (isDark) {
         ctx.save();
-        ctx.strokeStyle = 'rgba(212, 175, 55, 0.12)';
+        ctx.strokeStyle = auraConfig.glow;
         ctx.lineWidth = 0.8;
         ctx.setLineDash([3, 4]);
         ctx.beginPath();
@@ -394,12 +409,10 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
         ctx.fill();
 
         // Optional Planet Sanskrit Label on Hover / Distant View
-        if (isDark) {
-          ctx.font = '9px Cinzel, serif';
-          ctx.fillStyle = 'rgba(253, 242, 209, 0.45)';
-          ctx.textAlign = 'center';
-          ctx.fillText(planet.sanskrit, px, py + planet.size + 11);
-        }
+        ctx.font = '9px Cinzel, serif';
+        ctx.fillStyle = isDark ? 'rgba(253, 242, 209, 0.45)' : 'rgba(90, 60, 20, 0.65)';
+        ctx.textAlign = 'center';
+        ctx.fillText(planet.sanskrit, px, py + planet.size + 11);
 
         ctx.restore();
       });
@@ -489,9 +502,10 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
         if (Number.isFinite(tailX) && Number.isFinite(tailY) && Number.isFinite(s.x) && Number.isFinite(s.y)) {
           try {
             const grad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
-            grad.addColorStop(0, 'rgba(212, 175, 55, 0)');
-            grad.addColorStop(0.7, 'rgba(255, 242, 209, ' + s.alpha * 0.8 + ')');
-            grad.addColorStop(1, 'rgba(255, 255, 255, ' + s.alpha + ')');
+            grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            grad.addColorStop(0.6, auraConfig.glow);
+            grad.addColorStop(0.9, auraConfig.secondary);
+            grad.addColorStop(1, '#ffffff');
 
             ctx.save();
             ctx.beginPath();
@@ -499,8 +513,8 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ theme }) => {
             ctx.lineTo(s.x, s.y);
             ctx.strokeStyle = grad;
             ctx.lineWidth = s.thickness;
-            ctx.shadowColor = '#ffd700';
-            ctx.shadowBlur = 10;
+            ctx.shadowColor = auraConfig.primary;
+            ctx.shadowBlur = 12;
             ctx.stroke();
             ctx.restore();
           } catch (e) {}

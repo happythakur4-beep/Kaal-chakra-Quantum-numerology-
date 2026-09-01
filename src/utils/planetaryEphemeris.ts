@@ -20,6 +20,9 @@ export interface NatalPlanetPosition {
   nakshatra: string;
   nakshatraPada: number;
   house: number;
+  houseNumber?: number;
+  zodiacSign?: string;
+  degreeInSign?: number;
   isRetrograde: boolean;
   element: 'Fire' | 'Earth' | 'Air' | 'Water';
   color: string;
@@ -30,6 +33,10 @@ export interface NatalPlanetPosition {
 export interface NatalEphemerisData {
   birthDate: string;
   birthTime: string;
+  birthLocation?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
   julianDate: number;
   ayanamsa: number; // Lahiri Ayanamsa in degrees
   ascendant: {
@@ -38,9 +45,12 @@ export interface NatalEphemerisData {
     formattedDegree: string;
     longitude: number;
   };
+  ascendantSign?: string;
+  ascendantDegree?: number;
   planets: NatalPlanetPosition[];
   sunSign: string;
   moonSign: string;
+  moonNakshatra?: string;
   nakshatra: string;
 }
 
@@ -286,14 +296,40 @@ export function getZodiacFromLongitude(longitudeDeg: number) {
   };
 }
 
+// Popular global & Indian locations for precise birth ephemeris & Ascendant/Lagna calculation
+export const POPULAR_LOCATIONS: { [city: string]: { lat: number; lng: number; tz: number; country: string } } = {
+  'Varanasi, India': { lat: 25.3176, lng: 82.9739, tz: 5.5, country: 'India' },
+  'New Delhi, India': { lat: 28.6139, lng: 77.2090, tz: 5.5, country: 'India' },
+  'Mumbai, India': { lat: 19.0760, lng: 72.8777, tz: 5.5, country: 'India' },
+  'Bengaluru, India': { lat: 12.9716, lng: 77.5946, tz: 5.5, country: 'India' },
+  'Kolkata, India': { lat: 22.5726, lng: 88.3639, tz: 5.5, country: 'India' },
+  'Chennai, India': { lat: 13.0827, lng: 80.2707, tz: 5.5, country: 'India' },
+  'Jaipur, India': { lat: 26.9124, lng: 75.7873, tz: 5.5, country: 'India' },
+  'Ahmedabad, India': { lat: 23.0225, lng: 72.5714, tz: 5.5, country: 'India' },
+  'Pune, India': { lat: 18.5204, lng: 73.8567, tz: 5.5, country: 'India' },
+  'Hyderabad, India': { lat: 17.3850, lng: 78.4867, tz: 5.5, country: 'India' },
+  'Ayodhya, India': { lat: 26.7922, lng: 82.1998, tz: 5.5, country: 'India' },
+  'Haridwar, India': { lat: 29.9457, lng: 78.1642, tz: 5.5, country: 'India' },
+  'Ujjain, India': { lat: 23.1765, lng: 75.7885, tz: 5.5, country: 'India' },
+  'Lucknow, India': { lat: 26.8467, lng: 80.9462, tz: 5.5, country: 'India' },
+  'Patna, India': { lat: 25.5941, lng: 85.1376, tz: 5.5, country: 'India' },
+  'London, UK': { lat: 51.5074, lng: -0.1278, tz: 0, country: 'UK' },
+  'New York, USA': { lat: 40.7128, lng: -74.0060, tz: -5, country: 'USA' },
+  'San Francisco, USA': { lat: 37.7749, lng: -122.4194, tz: -8, country: 'USA' },
+  'Dubai, UAE': { lat: 25.2048, lng: 55.2708, tz: 4, country: 'UAE' },
+  'Tokyo, Japan': { lat: 35.6762, lng: 139.6503, tz: 9, country: 'Japan' },
+  'Sydney, Australia': { lat: -33.8688, lng: 151.2093, tz: 10, country: 'Australia' },
+  'Smiljan, Croatia': { lat: 44.5636, lng: 15.3197, tz: 1, country: 'Croatia' },
+};
+
 /**
  * Primary Master Calculation: Generates Full Birth Planetary Ephemeris
- * for any given Birth Date and Time!
+ * for any given Birth Date, Time, and Location!
  */
 export function calculateBirthPlanetaryPositions(
   birthDate: string,
   birthTime: string = '12:00',
-  birthCity: string = 'Default Location'
+  birthCity: string = 'New Delhi, India'
 ): NatalEphemerisData {
   let year = 1996;
   let month = 7;
@@ -326,13 +362,32 @@ export function calculateBirthPlanetaryPositions(
     }
   }
 
-  const jd = calculateJulianDay(year, month, day, hour, min);
+  // Location lookup for timezone & longitude correction
+  let locLng = 77.2090; // Default New Delhi longitude
+  let locTz = 5.5; // Default IST
+  if (birthCity) {
+    const matched = Object.entries(POPULAR_LOCATIONS).find(([key]) =>
+      birthCity.toLowerCase().includes(key.toLowerCase().split(',')[0].trim()) ||
+      key.toLowerCase().includes(birthCity.toLowerCase().trim())
+    );
+    if (matched) {
+      locLng = matched[1].lng;
+      locTz = matched[1].tz;
+    }
+  }
+
+  // Convert Local Time to Universal Time (UT)
+  const utDecimalHours = hour + min / 60 - locTz;
+  const utHour = Math.floor((utDecimalHours + 24) % 24);
+  const utMin = Math.round(((utDecimalHours + 24) % 1) * 60);
+
+  const jd = calculateJulianDay(year, month, day, utHour, utMin);
   const ayanamsa = calculateLahiriAyanamsa(jd);
 
-  // Earth's position
+  // Earth's heliocentric position
   const earthPos = calculateHeliocentricPosition('earth', jd);
 
-  // Approximate Sun Geocentric position (opposite of Earth)
+  // Sun Geocentric position (opposite of Earth)
   const sunGeocentricDeg = normalizeDeg(earthPos.lDeg + 180 - ayanamsa);
   const sunZodiac = getZodiacFromLongitude(sunGeocentricDeg);
 
@@ -340,13 +395,14 @@ export function calculateBirthPlanetaryPositions(
   const moonMeanDeg = normalizeDeg(218.316 + 13.176396 * (jd - 2451545.0) - ayanamsa);
   const moonZodiac = getZodiacFromLongitude(moonMeanDeg);
 
-  // Approximate Ascendant (Lagna) based on local hour
-  const siderealTimeHours = (6.6 + (jd - 2451545.0) * 0.0657 + hour + min / 60) % 24;
-  const ascendantLong = normalizeDeg(siderealTimeHours * 15 - ayanamsa);
+  // Ascendant (Lagna) based on Local Sidereal Time with Geographic Longitude
+  const gmstHours = (6.697374558 + 0.06570982441908 * (jd - 2451545.0) + (utDecimalHours + 24) % 24 * 1.00273790935) % 24;
+  const lmstHours = (gmstHours + locLng / 15.0 + 24) % 24;
+  const ascendantLong = normalizeDeg(lmstHours * 15 - ayanamsa);
   const ascZodiac = getZodiacFromLongitude(ascendantLong);
   const ascSignIdx = Math.floor(ascendantLong / 30) % 12;
 
-  // Rahu / Ketu (Mean Nodes)
+  // Rahu / Ketu (Mean Lunar Nodes)
   const rahuLong = normalizeDeg(125.0445 - 0.0529538 * (jd - 2451545.0) - ayanamsa);
   const ketuLong = normalizeDeg(rahuLong + 180);
   const rahuZodiac = getZodiacFromLongitude(rahuLong);
@@ -371,6 +427,9 @@ export function calculateBirthPlanetaryPositions(
     nakshatra: sunZodiac.nakshatra,
     nakshatraPada: sunZodiac.pada,
     house: ((Math.floor(sunGeocentricDeg / 30) - ascSignIdx + 12) % 12) + 1,
+    houseNumber: ((Math.floor(sunGeocentricDeg / 30) - ascSignIdx + 12) % 12) + 1,
+    zodiacSign: sunZodiac.sign,
+    degreeInSign: sunZodiac.degreeInSign,
     isRetrograde: false,
     element: sunZodiac.element,
     color: '#fbbf24',
@@ -395,6 +454,9 @@ export function calculateBirthPlanetaryPositions(
     nakshatra: moonZodiac.nakshatra,
     nakshatraPada: moonZodiac.pada,
     house: ((Math.floor(moonMeanDeg / 30) - ascSignIdx + 12) % 12) + 1,
+    houseNumber: ((Math.floor(moonMeanDeg / 30) - ascSignIdx + 12) % 12) + 1,
+    zodiacSign: moonZodiac.sign,
+    degreeInSign: moonZodiac.degreeInSign,
     isRetrograde: false,
     element: moonZodiac.element,
     color: '#e2e8f0',
@@ -440,6 +502,9 @@ export function calculateBirthPlanetaryPositions(
       nakshatra: zInfo.nakshatra,
       nakshatraPada: zInfo.pada,
       house: houseNum,
+      houseNumber: houseNum,
+      zodiacSign: zInfo.sign,
+      degreeInSign: zInfo.degreeInSign,
       isRetrograde: isRet,
       element: zInfo.element,
       color: pk.color,
@@ -465,6 +530,9 @@ export function calculateBirthPlanetaryPositions(
     nakshatra: rahuZodiac.nakshatra,
     nakshatraPada: rahuZodiac.pada,
     house: ((Math.floor(rahuLong / 30) - ascSignIdx + 12) % 12) + 1,
+    houseNumber: ((Math.floor(rahuLong / 30) - ascSignIdx + 12) % 12) + 1,
+    zodiacSign: rahuZodiac.sign,
+    degreeInSign: rahuZodiac.degreeInSign,
     isRetrograde: true,
     element: rahuZodiac.element,
     color: '#c084fc',
@@ -489,6 +557,9 @@ export function calculateBirthPlanetaryPositions(
     nakshatra: ketuZodiac.nakshatra,
     nakshatraPada: ketuZodiac.pada,
     house: ((Math.floor(ketuLong / 30) - ascSignIdx + 12) % 12) + 1,
+    houseNumber: ((Math.floor(ketuLong / 30) - ascSignIdx + 12) % 12) + 1,
+    zodiacSign: ketuZodiac.sign,
+    degreeInSign: ketuZodiac.degreeInSign,
     isRetrograde: true,
     element: ketuZodiac.element,
     color: '#fdba74',
@@ -499,6 +570,8 @@ export function calculateBirthPlanetaryPositions(
   return {
     birthDate,
     birthTime,
+    birthLocation: birthCity || 'New Delhi, India',
+    city: birthCity || 'New Delhi, India',
     julianDate: jd,
     ayanamsa,
     ascendant: {
@@ -507,9 +580,12 @@ export function calculateBirthPlanetaryPositions(
       formattedDegree: ascZodiac.formattedDegree,
       longitude: ascendantLong,
     },
+    ascendantSign: ascZodiac.sign,
+    ascendantDegree: ascZodiac.degreeInSign,
     planets,
     sunSign: sunZodiac.sign,
     moonSign: moonZodiac.sign,
+    moonNakshatra: moonZodiac.nakshatra,
     nakshatra: moonZodiac.nakshatra,
   };
 }

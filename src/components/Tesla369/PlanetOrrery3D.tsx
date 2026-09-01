@@ -31,6 +31,11 @@ interface PlanetOrrery3DProps {
   selectedBody: CelestialBodyData | null;
   onEnterBlackHolePortal: () => void;
   theme?: ThemeMode;
+  birthEphemeris?: NatalEphemerisData | null;
+  isBirthLocked?: boolean;
+  onOpenBirthModal?: () => void;
+  onResetBirthAlignment?: () => void;
+  onApplyBirthEphemeris?: (ephemeris: NatalEphemerisData) => void;
 }
 
 export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
@@ -39,6 +44,11 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
   selectedBody,
   onEnterBlackHolePortal,
   theme = 'dark',
+  birthEphemeris: propBirthEphemeris,
+  isBirthLocked: propIsBirthLocked,
+  onOpenBirthModal: propOnOpenBirthModal,
+  onResetBirthAlignment: propOnResetBirthAlignment,
+  onApplyBirthEphemeris: propOnApplyBirthEphemeris,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -50,13 +60,24 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
   const [showVortexGeometry, setShowVortexGeometry] = useState(true);
 
   // Birth Ephemeris state
-  const [isEphemerisModalOpen, setIsEphemerisModalOpen] = useState(false);
-  const [isBirthLockedMode, setIsBirthLockedMode] = useState(false);
-  const [birthEphemeris, setBirthEphemeris] = useState<NatalEphemerisData | null>(null);
+  const [localEphemerisModalOpen, setLocalEphemerisModalOpen] = useState(false);
+  const [localBirthLockedMode, setLocalBirthLockedMode] = useState(false);
+  const [localBirthEphemeris, setLocalBirthEphemeris] = useState<NatalEphemerisData | null>(null);
+
+  const effectiveBirthEphemeris = propBirthEphemeris !== undefined ? propBirthEphemeris : localBirthEphemeris;
+  const isBirthLockedMode = propIsBirthLocked !== undefined ? propIsBirthLocked : localBirthLockedMode;
 
   // Keep track of current angles for all bodies
   const anglesRef = useRef<{ [id: string]: number }>({});
   const targetAnglesRef = useRef<{ [id: string]: number }>({});
+
+  useEffect(() => {
+    if (effectiveBirthEphemeris && isBirthLockedMode) {
+      effectiveBirthEphemeris.planets.forEach((p) => {
+        targetAnglesRef.current[p.id] = p.orbitalAngleRad;
+      });
+    }
+  }, [effectiveBirthEphemeris, isBirthLockedMode]);
 
   useEffect(() => {
     celestialBodies.forEach((body) => {
@@ -67,14 +88,34 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
   }, [celestialBodies]);
 
   const handleApplyBirthPositions = (ephemeris: NatalEphemerisData) => {
-    setBirthEphemeris(ephemeris);
-    setIsBirthLockedMode(true);
+    setLocalBirthEphemeris(ephemeris);
+    setLocalBirthLockedMode(true);
     setIsPlaying(false);
 
     // Set target angles for each planet from the astronomical ephemeris
     ephemeris.planets.forEach((p) => {
       targetAnglesRef.current[p.id] = p.orbitalAngleRad;
     });
+
+    if (propOnApplyBirthEphemeris) {
+      propOnApplyBirthEphemeris(ephemeris);
+    }
+  };
+
+  const handleResetBirthMode = () => {
+    setLocalBirthLockedMode(false);
+    setIsPlaying(true);
+    if (propOnResetBirthAlignment) {
+      propOnResetBirthAlignment();
+    }
+  };
+
+  const handleOpenModal = () => {
+    if (propOnOpenBirthModal) {
+      propOnOpenBirthModal();
+    } else {
+      setLocalEphemerisModalOpen(true);
+    }
   };
 
   useEffect(() => {
@@ -320,8 +361,8 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
           ctx.shadowBlur = 5;
           ctx.fillText(body.name.split(' ')[0], screenX, screenY + bodyR + 17);
 
-          if (isBirthLockedMode && birthEphemeris) {
-            const natalP = birthEphemeris.planets.find((p) => p.id === body.id);
+          if (isBirthLockedMode && effectiveBirthEphemeris) {
+            const natalP = effectiveBirthEphemeris.planets.find((p) => p.id === body.id);
             if (natalP) {
               ctx.fillStyle = '#ffd700';
               ctx.font = 'bold 10px monospace';
@@ -354,7 +395,7 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
     showOrbitTracks,
     showVortexGeometry,
     isBirthLockedMode,
-    birthEphemeris,
+    effectiveBirthEphemeris,
   ]);
 
   // Mouse Interaction handlers
@@ -419,18 +460,6 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
 
   return (
     <div className="relative w-full h-[540px] sm:h-[640px] rounded-3xl overflow-hidden border border-amber-500/30 bg-[#06030e] shadow-[0_0_50px_rgba(0,0,0,0.8)] select-none">
-      {/* Birth Planetary Ephemeris Modal */}
-      <BirthPlanetaryEphemerisModal
-        isOpen={isEphemerisModalOpen}
-        onClose={() => setIsEphemerisModalOpen(false)}
-        onApplyBirthPositions={handleApplyBirthPositions}
-        onFocusPlanet={(pid) => {
-          const body = celestialBodies.find((b) => b.id === pid);
-          if (body) onSelectBody(body);
-        }}
-        theme={theme}
-      />
-
       {/* 3D Canvas */}
       <canvas
         ref={canvasRef}
@@ -443,7 +472,7 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
       <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-wrap items-center gap-2">
         <button
           onClick={() => {
-            setIsBirthLockedMode(false);
+            handleResetBirthMode();
             setIsPlaying(!isPlaying);
           }}
           className="p-2.5 rounded-xl bg-black/70 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 transition-all shadow-lg cursor-pointer"
@@ -458,7 +487,7 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
             <button
               key={spd}
               onClick={() => {
-                setIsBirthLockedMode(false);
+                handleResetBirthMode();
                 setSpeedMultiplier(spd);
                 setIsPlaying(true);
               }}
@@ -518,7 +547,7 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-2">
         {/* Birth Ephemeris Button */}
         <button
-          onClick={() => setIsEphemerisModalOpen(true)}
+          onClick={handleOpenModal}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-cinzel font-bold tracking-wider transition-all shadow-lg cursor-pointer ${
             isBirthLockedMode
               ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-cyan-400 text-black border border-amber-300 shadow-[0_0_25px_rgba(255,215,0,0.5)] scale-105'
@@ -541,20 +570,17 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
       </div>
 
       {/* Birth Position Notification Banner (If active) */}
-      {isBirthLockedMode && birthEphemeris && (
+      {isBirthLockedMode && effectiveBirthEphemeris && (
         <div className="absolute top-16 right-3 sm:right-4 z-20 p-2.5 px-4 rounded-2xl bg-black/90 border border-amber-400/60 backdrop-blur-md text-xs text-amber-200 flex items-center gap-3 shadow-2xl animate-fade-in">
           <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
           <div>
-            <span className="font-bold text-white">Natal Chart Ephemeris:</span> {birthEphemeris.birthDate} at {birthEphemeris.birthTime}
+            <span className="font-bold text-white">Natal Chart Ephemeris:</span> {effectiveBirthEphemeris.birthDate} at {effectiveBirthEphemeris.birthTime} ({(effectiveBirthEphemeris.birthLocation || effectiveBirthEphemeris.city || 'Birth Chart').split(',')[0]})
             <div className="text-[11px] text-cyan-300">
-              Sun in {birthEphemeris.sunSign} • Moon in {birthEphemeris.moonSign} • {birthEphemeris.nakshatra}
+              Sun in {effectiveBirthEphemeris.sunSign} • Moon in {effectiveBirthEphemeris.moonSign} • Lagna {effectiveBirthEphemeris.ascendantSign || effectiveBirthEphemeris.ascendant.sign}
             </div>
           </div>
           <button
-            onClick={() => {
-              setIsBirthLockedMode(false);
-              setIsPlaying(true);
-            }}
+            onClick={handleResetBirthMode}
             className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white cursor-pointer ml-1"
           >
             Resume Live Orbits
@@ -611,6 +637,15 @@ export const PlanetOrrery3D: React.FC<PlanetOrrery3DProps> = ({
           </button>
         ))}
       </div>
+
+      {/* Embedded Birth Ephemeris Modal */}
+      {localEphemerisModalOpen && (
+        <BirthPlanetaryEphemerisModal
+          onClose={() => setLocalEphemerisModalOpen(false)}
+          onApplyEphemeris={handleApplyBirthPositions}
+          initialData={effectiveBirthEphemeris || undefined}
+        />
+      )}
     </div>
   );
 };

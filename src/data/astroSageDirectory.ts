@@ -1,5 +1,12 @@
 import { ScreenType } from '../types';
 
+export interface AstrologerReview {
+  quote: string;
+  author: string;
+  rating?: number;
+  timeAgo?: string;
+}
+
 export interface AIAstrologer {
   id: string;
   name: string;
@@ -11,10 +18,15 @@ export interface AIAstrologer {
   experienceYears: number;
   totalConsultations: string;
   isOnline: boolean;
+  isOccupied?: boolean;
+  consultationStatus?: 'available' | 'in_consultation' | 'offline';
+  estimatedWaitTimeMin?: number;
+  activeQueueCount?: number;
   specialties: string[];
   languages: string[];
   systemPrompt: string;
   greetingMessage: string;
+  topReview?: AstrologerReview;
 }
 
 export interface SubFeatureItem {
@@ -65,10 +77,20 @@ export const AI_ASTROLOGERS_LIST: AIAstrologer[] = [
     experienceYears: 32,
     totalConsultations: '24.5k+',
     isOnline: true,
+    isOccupied: false,
+    consultationStatus: 'available',
+    estimatedWaitTimeMin: 0,
+    activeQueueCount: 0,
     specialties: ['Kundli Dosh', 'Mantra Sadhana', 'Spiritual Guidance', 'Vedic Upay'],
     languages: ['Hindi', 'Sanskrit', 'English'],
     systemPrompt: 'You are Swami Ji, an enlightened Vedic Rishi from Varanasi with 32 years of Vedic shastra mastery. Speak with immense warmth, blessing the seeker with "आयुष्मान भव" and quoting authentic Brihat Parashara verses, offering compassionate remedies.',
-    greetingMessage: 'हरि ॐ! आयुष्मान भव वत्स। मैं स्वामी जी हूँ। अपनी जन्म कुंडली, जीवन की उलझन या किसी भी समस्या के समाधान हेतु प्रश्न पूछें।'
+    greetingMessage: 'हरि ॐ! आयुष्मान भव वत्स। मैं स्वामी जी हूँ। अपनी जन्म कुंडली, जीवन की उलझन या किसी भी समस्या के समाधान हेतु प्रश्न पूछें।',
+    topReview: {
+      quote: 'His Varanasi Vedic guidance brought supreme clarity and peace to my family during Rahu dasha.',
+      author: 'Pooja S., Varanasi',
+      rating: 5,
+      timeAgo: '1h ago'
+    }
   },
   {
     id: 'arjun-pandit',
@@ -81,10 +103,20 @@ export const AI_ASTROLOGERS_LIST: AIAstrologer[] = [
     experienceYears: 18,
     totalConsultations: '38.2k+',
     isOnline: true,
+    isOccupied: true,
+    consultationStatus: 'in_consultation',
+    estimatedWaitTimeMin: 4,
+    activeQueueCount: 2,
     specialties: ['Janam Kundli', 'Career Growth', 'Finance & Wealth', 'Grah Dasha'],
     languages: ['Hindi', 'English'],
     systemPrompt: 'You are Arjun Pandit, an expert in Parashari Jyotish, Lagna Analysis, D10 Dashamsha career readings, and D9 Navamsha destiny trends.',
-    greetingMessage: 'प्रणाम! मैं पंडित अर्जुन। आपकी जन्म कुंडली के नवग्रह और 12 भावों के आधार पर सटीक विश्लेषण के लिए तैयार हूँ। क्या मार्गदर्शन चाहिए?'
+    greetingMessage: 'प्रणाम! मैं पंडित अर्जुन। आपकी जन्म कुंडली के नवग्रह और 12 भावों के आधार पर सटीक विश्लेषण के लिए तैयार हूँ। क्या मार्गदर्शन चाहिए?',
+    topReview: {
+      quote: 'Predicted my senior promotion and job relocation down to the exact week. Truly unbelievable accuracy!',
+      author: 'Rahul V., Bengaluru',
+      rating: 5,
+      timeAgo: '28m ago'
+    }
   },
   {
     id: 'mr-krishnamurti',
@@ -97,10 +129,20 @@ export const AI_ASTROLOGERS_LIST: AIAstrologer[] = [
     experienceYears: 27,
     totalConsultations: '19.8k+',
     isOnline: true,
+    isOccupied: false,
+    consultationStatus: 'available',
+    estimatedWaitTimeMin: 0,
+    activeQueueCount: 0,
     specialties: ['KP Horary 1-249', 'Sub-Lord Analysis', 'Precise Event Timing', 'Job Selection'],
     languages: ['English', 'Hindi', 'Tamil'],
     systemPrompt: 'You are Acharya Krishnamurti, a master of KP Astrology and Cuspal Sub-Lord theory. Provide pin-point timing of events.',
-    greetingMessage: 'Namaste! I am Master Krishnamurti. Give me your query or a Horary number between 1 to 249 for precise sub-lord timing.'
+    greetingMessage: 'Namaste! I am Master Krishnamurti. Give me your query or a Horary number between 1 to 249 for precise sub-lord timing.',
+    topReview: {
+      quote: 'KP Horary sub-lord analysis predicted my property deal approval down to the precise hour.',
+      author: 'Ananya M., Mumbai',
+      rating: 5,
+      timeAgo: '2h ago'
+    }
   },
   {
     id: 'love-guru',
@@ -113,10 +155,20 @@ export const AI_ASTROLOGERS_LIST: AIAstrologer[] = [
     experienceYears: 15,
     totalConsultations: '42.1k+',
     isOnline: true,
+    isOccupied: true,
+    consultationStatus: 'in_consultation',
+    estimatedWaitTimeMin: 7,
+    activeQueueCount: 3,
     specialties: ['Love Compatibility', 'Kundli Milan (36 Guna)', 'Manglik Dosha', 'Ex-Reconciliation'],
     languages: ['Hindi', 'English', 'Punjabi'],
     systemPrompt: 'You are Love Guru Dev, specializing in 7th house Venus-Mars synastry, Ashtakoota Milan, and resolving marital and relationship discord.',
-    greetingMessage: 'नमस्ते! प्रेम और वैवाहिक जीवन में सुख, सामंजस्य और गुण मिलान के लिए आपका स्वागत है। बताएं आपके दिल में क्या सवाल है?'
+    greetingMessage: 'नमस्ते! प्रेम और वैवाहिक जीवन में सुख, सामंजस्य और गुण मिलान के लिए आपका स्वागत है। बताएं आपके दिल में क्या सवाल है?',
+    topReview: {
+      quote: 'Resolved our Ashtakoota Nadi dosha anxiety and gave practical remedies that worked wonders.',
+      author: 'Vikram & Sneha, Delhi',
+      rating: 5,
+      timeAgo: '15m ago'
+    }
   },
   {
     id: 'acharya-dev',
@@ -129,10 +181,20 @@ export const AI_ASTROLOGERS_LIST: AIAstrologer[] = [
     experienceYears: 22,
     totalConsultations: '15.6k+',
     isOnline: true,
+    isOccupied: true,
+    consultationStatus: 'in_consultation',
+    estimatedWaitTimeMin: 3,
+    activeQueueCount: 1,
     specialties: ['Lal Kitab Upay', 'Vastu 16 Zones', 'Rin Nivaran', 'Nazar Dosh'],
     languages: ['Hindi', 'Gujarati', 'English'],
     systemPrompt: 'You are Acharya Dev, master of Lal Kitab totkas, 9 Ancestral Rin debt removal, and Vastu directional balancing.',
-    greetingMessage: 'शुभम भवतु! लाल किताब के सरल व अचूक उपायों तथा वास्तु दोष निवारण हेतु मैं आचार्य देव आपकी सेवा में उपस्थित हूँ।'
+    greetingMessage: 'शुभम भवतु! लाल किताब के सरल व अचूक उपायों तथा वास्तु दोष निवारण हेतु मैं आचार्य देव आपकी सेवा में उपस्थित हूँ।',
+    topReview: {
+      quote: 'His 43-day Lal Kitab remedy for Pitra Rin removed long-standing obstacles from our business.',
+      author: 'Gaurav K., Ahmedabad',
+      rating: 5,
+      timeAgo: '4h ago'
+    }
   },
   {
     id: 'dr-radhakrishnan',
@@ -145,10 +207,20 @@ export const AI_ASTROLOGERS_LIST: AIAstrologer[] = [
     experienceYears: 20,
     totalConsultations: '28.9k+',
     isOnline: true,
+    isOccupied: false,
+    consultationStatus: 'available',
+    estimatedWaitTimeMin: 0,
+    activeQueueCount: 0,
     specialties: ['Lo Shu Grid', 'Name Spelling Correction', 'Lucky Numbers & Colors', 'Business Name'],
     languages: ['English', 'Hindi', 'Malayalam'],
     systemPrompt: 'You are Dr. Radhakrishnan, PhD in Numerology, expert in Chaldean & Pythagorean calculations, Mulank-Bhagyank synergy, and Lo Shu grid.',
-    greetingMessage: 'Greetings! Numbers govern destiny and cosmic vibrations. Provide your date of birth and full name for numerological alignment.'
+    greetingMessage: 'Greetings! Numbers govern destiny and cosmic vibrations. Provide your date of birth and full name for numerological alignment.',
+    topReview: {
+      quote: 'Chaldean name correction aligned my Mulank 1 and Bhagyank 7 perfectly. Highly recommend!',
+      author: 'Deepika R., Chennai',
+      rating: 5,
+      timeAgo: '3h ago'
+    }
   }
 ];
 

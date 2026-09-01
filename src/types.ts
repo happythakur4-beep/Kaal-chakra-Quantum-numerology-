@@ -1,5 +1,9 @@
 export type ScreenType = 
   | 'landing' 
+  | 'energy-balance'
+  | 'mind-healing'
+  | 'sound-healing'
+  | 'memory-hypnosis'
   | 'portal' 
   | 'tesla-369'
   | 'karma'
@@ -36,6 +40,10 @@ export interface UserProfile {
   contributionPaid?: number;
   activeAura: AuraType;
   unlockedModules: string[];
+  karmaScore?: number;
+  punyaScore?: number;
+  papaScore?: number;
+  karmaDebtPercent?: number;
 }
 
 export type AuraType = 'Calm Amber' | 'Radiant Rose' | 'Celestial Gold' | 'Aetheric Violet' | 'Emerald Clarity';
@@ -165,7 +173,7 @@ export interface TeslaVortexNode {
   connections: number[];
 }
 
-export type CyberTab = 'planets' | 'sudarshan' | 'galaxy' | 'terminal' | 'vortex' | 'tune-thrive' | 'blackhole' | 'chakras' | 'etheric';
+export type CyberTab = 'planets' | 'maps-radar' | 'sudarshan' | 'galaxy' | 'terminal' | 'vortex' | 'tune-thrive' | 'blackhole' | 'chakras' | 'etheric';
 
 export interface SacredExhibitData {
   id: string;
@@ -191,6 +199,157 @@ export interface SacredExhibitData {
   scientificTeslaInsight: string;
   sacredSymbolism: { label: string; value: string }[];
   keyPowers: string[];
+}
+
+export type KoshaLevel = 'Annamaya (Physical)' | 'Pranamaya (Energy/Breath)' | 'Manomaya (Mental/Emotional)' | 'Vijnanamaya (Wisdom/Intellect)' | 'Anandamaya (Bliss/Source)';
+
+export type IllnessCategory = 
+  | 'pain_musculoskeletal'
+  | 'cardiovascular_heart'
+  | 'metabolism_endocrine'
+  | 'autoimmune_immunity'
+  | 'neurological_mental'
+  | 'digestive_gut'
+  | 'respiratory_lungs'
+  | 'cellular_tumoral'
+  | 'dermatological_skin'
+  | 'urinary_renal'
+  | 'custom_universal';
+
+export interface MindHealingProtocol {
+  id: string;
+  illnessName: string;
+  sanskritName: string;
+  category: IllnessCategory;
+  organAffected: string;
+  chakraLocus: string;
+  chakraColor: string;
+  koshaLevel: KoshaLevel;
+  solfeggioHz: number;
+  solfeggioBenefit: string;
+  rootPsychosomaticPattern: string;
+  epigeneticAffirmation: string;
+  sanskritMantra: {
+    deityOrRishi: string;
+    sanskrit: string;
+    transliteration: string;
+    meaning: string;
+    japaCount: number;
+  };
+  visualizationSteps: {
+    phase: string;
+    title: string;
+    instruction: string;
+    targetVisual: string;
+  }[];
+  pranayamaRhythm: {
+    technique: string;
+    inhaleSec: number;
+    holdSec: number;
+    exhaleSec: number;
+    pauseSec: number;
+    description: string;
+  };
+  vagusNerveProtocol: string;
+  mindControlKey: string;
+}
+
+export interface MindHealingSessionLog {
+  id: string;
+  date: string;
+  illnessName: string;
+  durationMinutes: number;
+  painBefore: number;
+  painAfter: number;
+  mentalCoherenceScore: number;
+  notes?: string;
+}
+
+// ==========================================
+// MEMORY HEALING HYPNOSIS TYPES
+// ==========================================
+
+export type HypnosisTechniqueCategory = 
+  | 'bad_memory_extinction'
+  | 'trauma_reconsolidation'
+  | 'submodality_dimmer'
+  | 'directed_amnesia'
+  | 'cognitive_hypermnesia'
+  | 'memory_palace_loci'
+  | 'synaptic_ltp_boost'
+  | 'exam_eidetic_recall';
+
+export type HypnoticBrainwaveState = 'beta' | 'alpha' | 'theta' | 'delta' | 'gamma';
+
+export interface BrainNode3D {
+  id: string;
+  name: string;
+  sanskritName: string;
+  function: string;
+  clinicalSignificance: string;
+  position: [number, number, number]; // x, y, z
+  color: string;
+  lightningIntensity: number;
+  roleInMemory: 'storage' | 'emotional_tag' | 'executive_control' | 'consolidation' | 'relay';
+  targetFrequencyHz?: number;
+}
+
+export interface MemoryHypnosisProtocol {
+  id: string;
+  title: string;
+  sanskritTitle: string;
+  category: HypnosisTechniqueCategory;
+  targetBrainArea: string[];
+  targetBrainwave: HypnoticBrainwaveState;
+  binauralHz: number;
+  isochronicHz: number;
+  summary: string;
+  neurobiologicalMechanism: string;
+  scientificReferences: string[];
+  durationMinutes: number;
+  inductionType: 'elman_lightning' | 'progressive_soma' | 'fractionation' | 'pattern_interrupt';
+  steps: {
+    phaseNumber: number;
+    phaseTitle: string;
+    durationSec: number;
+    scriptNarration: string;
+    subconsciousAction: string;
+    visualAnimationState: 'idle' | 'lightning_focus' | 'synaptic_sever' | 'gray_fade' | 'rewind_reverse' | 'golden_consolidation' | 'plasma_shield';
+    lightningArcTargets: string[];
+  }[];
+  postHypnoticSuggestion: string;
+  submodalityInstructions?: {
+    colorShift: string;
+    distanceShift: string;
+    sizeShift: string;
+    soundShift: string;
+    speedShift: string;
+  };
+}
+
+export interface MemoryPalaceLociItem {
+  id: string;
+  roomName: string;
+  anchorObject: string;
+  conceptTitle: string;
+  memoryKey: string;
+  vividImageryNote: string;
+  lightningActive: boolean;
+  recallTested?: boolean;
+}
+
+export interface MemorySessionLog {
+  id: string;
+  date: string;
+  targetMemoryTitle: string;
+  protocolId: string;
+  techniqueCategory: HypnosisTechniqueCategory;
+  sudsBefore: number; // 0-10 Subjective Units of Distress
+  sudsAfter: number;  // 0-10
+  emotionalChargeReductionPct: number;
+  recallClarityScore?: number; // 0-100 for sharpening
+  tranceDepthReached: 'Light' | 'Medium' | 'Somnambulistic' | 'Esdaile State';
+  notes: string;
 }
 
 

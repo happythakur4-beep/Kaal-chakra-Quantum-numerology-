@@ -23,6 +23,10 @@ export const INITIAL_USER: UserProfile = {
   contributionPaid: 108,
   activeAura: 'Calm Amber',
   unlockedModules: ['astro-num-basics', 'crystal-healing', 'vedic-astrology-101'],
+  karmaScore: 1080,
+  punyaScore: 1450,
+  papaScore: 370,
+  karmaDebtPercent: 24,
 };
 
 export const INITIAL_REPORTS: ReportItem[] = [

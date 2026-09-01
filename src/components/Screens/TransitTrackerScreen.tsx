@@ -175,41 +175,115 @@ export const TransitTrackerScreen: React.FC<TransitTrackerScreenProps> = ({ them
     { date: 'Sep 22, 2026', title: 'Sharad Navratri Ghatasthapana', type: 'Devi Shakti Mahaparva', auspicious: true, desc: 'Nine sacred nights of Navagraha alignment.' },
   ];
 
-  // Gochar Phal Calculation for Selected Rashi
+  // Gochar Phal Calculation for Selected Rashi (All 12 Vedic Moon Signs)
   const getRashiGocharSummary = (rashi: string) => {
-    if (rashi.includes('Gemini') || rashi.includes('Mithuna')) {
+    const r = rashi.toLowerCase();
+    if (r.includes('aries') || r.includes('mesha')) {
       return {
-        guruGochar: '12th House (Vyaya) — Higher learning, foreign journeys, spiritual expense.',
-        shaniGochar: '9th House (Bhagya / Shani Dhaiya) — Fortunes reward disciplined hard work and dharma.',
-        rahuKetuGochar: '10th & 4th House Axis — Career expansion and home-life restructuring.',
-        overallScore: '82% High Resonance',
-        shanti: 'Recite Vishnu Sahasranama on Thursdays & donate sesame seeds on Saturdays.',
-      };
-    }
-    if (rashi.includes('Aries') || rashi.includes('Mesha')) {
-      return {
-        guruGochar: '2nd House (Dhana Bhava) — Tremendous financial accumulation and family harmony.',
-        shaniGochar: '11th House (Labha Bhava) — Supreme gains, long-term goals manifest.',
-        rahuKetuGochar: '12th & 6th House Axis — Victory over competition, foreign gains.',
+        guruGochar: '2nd House (Dhana Bhava) — Tremendous financial accumulation, family harmony, and verbal influence.',
+        shaniGochar: '11th House (Labha Bhava) — Supreme gains from past investments; long-term aspirations manifest.',
+        rahuKetuGochar: '12th & 6th House Axis — Foreign journeys, victory over competitive rivals and court disputes.',
         overallScore: '94% Auspicious Alignment',
-        shanti: 'Offer yellow flowers to Lord Shiva and feed birds in the morning.',
+        shanti: 'Offer yellow flowers to Lord Shiva on Mondays and chant Hanuman Chalisa daily.',
       };
     }
-    if (rashi.includes('Aquarius') || rashi.includes('Kumbha')) {
+    if (r.includes('taurus') || r.includes('vrishabha')) {
       return {
-        guruGochar: '4th House (Sukha Bhava) — Property gains, domestic happiness, vehicle purchase.',
-        shaniGochar: '1st House (Janma Shani / Peak Sade Sati) — Intense self-transformation, leadership responsibility.',
-        rahuKetuGochar: '2nd & 8th House Axis — Financial caution, sudden intuitive awakenings.',
-        overallScore: '76% Transformative Period',
-        shanti: 'Light a mustard oil diya under Peepal tree on Saturdays & recite Hanuman Chalisa.',
+        guruGochar: '1st House (Janma Lagna) — Spiritual clarity, divine wisdom, physical health revitalization.',
+        shaniGochar: '10th House (Karma Bhava) — High professional responsibility, structural promotion through discipline.',
+        rahuKetuGochar: '11th & 5th House Axis — Speculative gains, creative breakthroughs, and progeny expansion.',
+        overallScore: '89% High Alignment',
+        shanti: 'Recite Sri Suktam on Fridays and offer white fragrant sweets to young girls.',
       };
     }
+    if (r.includes('gemini') || r.includes('mithuna')) {
+      return {
+        guruGochar: '12th House (Vyaya Bhava) — Foreign opportunities, expenditure on spiritual and charitable causes.',
+        shaniGochar: '9th House (Bhagya Bhava) — Fortunes reward systematic hard work, higher research, and pilgrimage.',
+        rahuKetuGochar: '10th & 4th House Axis — Professional leadership shifts and real-estate upgrades.',
+        overallScore: '84% Harmonious Resonance',
+        shanti: 'Recite Vishnu Sahasranama on Thursdays & donate green lentils on Wednesdays.',
+      };
+    }
+    if (r.includes('cancer') || r.includes('karka')) {
+      return {
+        guruGochar: '11th House (Labha Bhava) — Massive income generation, helpful mentors, and fulfilled ambitions.',
+        shaniGochar: '8th House (Ashtama Shani Dhaiya) — Inner occult awakening, joint asset scrutiny, stress relief via dhyana.',
+        rahuKetuGochar: '9th & 3rd House Axis — Long-distance journeys, courage surge, and digital communication wins.',
+        overallScore: '81% Growth with Caution',
+        shanti: 'Perform Rudrabhishek on Mondays and offer water to rising Surya Dev.',
+      };
+    }
+    if (r.includes('leo') || r.includes('simha')) {
+      return {
+        guruGochar: '10th House (Karma Bhava) — Rapid career ascension, public accolades, and advisory leadership.',
+        shaniGochar: '7th House (Kendra Gochar) — Serious relationship commitments, long-term business partnerships.',
+        rahuKetuGochar: '8th & 2nd House Axis — Prudent budget management, intuitive insights into hidden knowledge.',
+        overallScore: '88% Royal Power Period',
+        shanti: 'Offer Arghya to Sun with red sandalwood daily and chant Aditya Hridaya Stotram on Sundays.',
+      };
+    }
+    if (r.includes('virgo') || r.includes('kanya')) {
+      return {
+        guruGochar: '9th House (Bhagya Bhava) — Supreme spiritual fortune, higher academic triumphs, and father blessings.',
+        shaniGochar: '6th House (Shatru Hanta) — Complete destruction of debts and adversaries; robust stamina.',
+        rahuKetuGochar: '7th & 1st House Axis — Transformation of personal outlook and commercial alliances.',
+        overallScore: '92% Fortunate Golden Transit',
+        shanti: 'Feed green fodder or spinach to cows on Wednesdays and chant Budha Bija Mantra.',
+      };
+    }
+    if (r.includes('libra') || r.includes('tula')) {
+      return {
+        guruGochar: '8th House (Guhya Bhava) — Occult revelations, inheritance gains, and research breakthroughs.',
+        shaniGochar: '5th House (Trikona Gochar) — Intellectual discipline, successful education, and creative monetization.',
+        rahuKetuGochar: '6th & 12th House Axis — Conquering legal hurdles and spiritual sanctuary experiences.',
+        overallScore: '83% Transformative Awakening',
+        shanti: 'Donate white clothing to underprivileged on Fridays and light a ghee lamp for Goddess Lakshmi.',
+      };
+    }
+    if (r.includes('scorpio') || r.includes('vrishchika')) {
+      return {
+        guruGochar: '7th House (Kalyana Bhava) — Supreme marital bliss, business mergers, and flourishing public popularity.',
+        shaniGochar: '4th House (Kantaka Shani Dhaiya) — Domestic relocation, renovations, and mental peace cultivation.',
+        rahuKetuGochar: '5th & 11th House Axis — Speculative gains, unique creative projects, and network expansion.',
+        overallScore: '86% Auspicious Partnership Transit',
+        shanti: 'Chant Sundarkand on Tuesdays and distribute jaggery/gram to laborers.',
+      };
+    }
+    if (r.includes('sagittarius') || r.includes('dhanu')) {
+      return {
+        guruGochar: '6th House (Upachaya Bhava) — Triumph over debts, health restoration, and competitive mastery.',
+        shaniGochar: '3rd House (Parakrama Bhava) — Immense willpower, sibling support, and profitable short travels.',
+        rahuKetuGochar: '4th & 10th House Axis — Career elevation, institutional respect, and balanced home life.',
+        overallScore: '90% High Vitality & Victory',
+        shanti: 'Chant Om Namo Bhagavate Vasudevaya on Thursdays and donate yellow bananas to priests.',
+      };
+    }
+    if (r.includes('capricorn') || r.includes('makara')) {
+      return {
+        guruGochar: '5th House (Poorva Punya) — Intellect flourishes, investment profits, auspicious child ceremonies.',
+        shaniGochar: '2nd House (Dhana Bhava - Sade Sati Final Phase) — Solidifying accumulated wealth, emotional maturity.',
+        rahuKetuGochar: '3rd & 9th House Axis — Dynamic courage, digital marketing success, and philosophical quests.',
+        overallScore: '87% Wealth & Wisdom Manifestation',
+        shanti: 'Light a mustard oil diya under Peepal tree on Saturday dusk and chant Shani Stotra.',
+      };
+    }
+    if (r.includes('aquarius') || r.includes('kumbha')) {
+      return {
+        guruGochar: '4th House (Sukha Bhava) — Real estate acquisition, family luxury, and emotional contentment.',
+        shaniGochar: '1st House (Janma Shani / Peak Sade Sati) — High leadership responsibility, profound maturity.',
+        rahuKetuGochar: '2nd & 8th House Axis — Astute financial control, deep spiritual grounding.',
+        overallScore: '79% Deep Structural Maturity',
+        shanti: 'Recite Hanuman Chalisa daily and donate warm black blankets or sesame on Saturdays.',
+      };
+    }
+    // Pisces / Meena
     return {
-      guruGochar: 'Favorable Kendra / Trikona Gochar — Growth in wisdom, spiritual insights, and luck.',
-      shaniGochar: 'Stabilizing Saturn Gochar — Structural discipline creates permanent foundations.',
-      rahuKetuGochar: 'Karmic Axis Alignment — Awakening untapped latent occult talents.',
-      overallScore: '85% Harmonious Gochar',
-      shanti: 'Daily Gayatri Mantra recitation and water offering (Arghya) to Surya Dev.',
+      guruGochar: '3rd House (Bhratri Bhava) — Bold initiatives, creative writing, arts, and strong enterprise.',
+      shaniGochar: '12th House (Rising Sade Sati Phase 1) — Overseas travel, meditative retreats, structured expense.',
+      rahuKetuGochar: '1st & 7th House Axis — Re-inventing personal identity and relationship dynamics.',
+      overallScore: '80% Spiritual Metamorphosis',
+      shanti: 'Chant Maha Mrityunjaya Mantra 108 times on Mondays and offer yellow sweets on Thursdays.',
     };
   };
 
@@ -286,31 +360,31 @@ export const TransitTrackerScreen: React.FC<TransitTrackerScreenProps> = ({ them
                     {graha.symbol}
                   </span>
                   <div>
-                    <h3 className="text-xs font-cinzel font-bold text-[#fdf2d1]">{graha.name}</h3>
-                    <span className="text-[0.62rem] font-serif text-gray-400 block">{graha.sanskrit}</span>
+                    <h3 className={`text-xs font-cinzel font-bold ${isDark ? 'text-[#fdf2d1]' : 'text-[#3b2b0a]'}`}>{graha.name}</h3>
+                    <span className={`text-[0.62rem] font-serif block ${isDark ? 'text-gray-400' : 'text-[#78350f]'}`}>{graha.sanskrit}</span>
                   </div>
                 </div>
                 <span className={`text-[0.62rem] font-semibold px-2 py-0.5 rounded ${
                   graha.motion.includes('Vakri')
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    ? isDark ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-amber-100 text-amber-800 border-amber-300'
+                    : isDark ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-800 border-emerald-300'
                 }`}>
                   {graha.motion}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[0.7rem] font-serif pt-2 border-t border-white/5">
+              <div className={`grid grid-cols-2 gap-2 text-[0.7rem] font-serif pt-2 border-t ${isDark ? 'border-white/5' : 'border-amber-200'}`}>
                 <div>
-                  <span className="text-gray-400 text-[0.62rem] block">Gochar Rashi:</span>
-                  <span className="font-semibold text-amber-300 truncate block">{graha.rashi}</span>
+                  <span className={`text-[0.62rem] block ${isDark ? 'text-gray-400' : 'text-[#5a4313]'}`}>Gochar Rashi:</span>
+                  <span className={`font-semibold truncate block ${isDark ? 'text-amber-300' : 'text-[#92400e]'}`}>{graha.rashi}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-[0.62rem] block">Degree (Bhaga):</span>
-                  <span className="font-mono text-gray-200">{graha.degree}</span>
+                  <span className={`text-[0.62rem] block ${isDark ? 'text-gray-400' : 'text-[#5a4313]'}`}>Degree (Bhaga):</span>
+                  <span className={`font-mono ${isDark ? 'text-gray-200' : 'text-[#2a1704]'}`}>{graha.degree}</span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-gray-400 text-[0.62rem] block">Gochar Nakshatra:</span>
-                  <span className="text-gray-300 text-[0.68rem]">{graha.nakshatra}</span>
+                  <span className={`text-[0.62rem] block ${isDark ? 'text-gray-400' : 'text-[#5a4313]'}`}>Gochar Nakshatra:</span>
+                  <span className={`text-[0.68rem] ${isDark ? 'text-gray-300' : 'text-[#4a3518]'}`}>{graha.nakshatra}</span>
                 </div>
               </div>
             </div>

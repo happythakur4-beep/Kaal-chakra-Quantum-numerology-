@@ -145,6 +145,14 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
   return (
     <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 sm:pt-6 sm:pb-16">
       
+      {/* Light Theme Photo Background for Kundli */}
+      {!isDark && (
+        <div 
+          className="fixed inset-0 z-[-1] opacity-[0.08] mix-blend-multiply bg-cover bg-center pointer-events-none"
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2000&auto=format&fit=crop')` }} // Golden astrological/astronomy clock vibes
+        />
+      )}
+
       {/* Header Title */}
       <div className="text-center mb-6 sm:mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border mb-3 text-[0.7rem] sm:text-xs font-cinzel tracking-widest uppercase"
@@ -311,7 +319,7 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>
-              <strong>Lagna Chakra & Ephemeris Generated!</strong> Planetary positions, Nakshatras, Navamsha coordinates, and Vimshottari Mahadasha have been computed for <strong>{kundli.userName}</strong>.
+              <strong>Lagna Chakra & Ephemeris Generated!</strong> Planetary positions, Nakshatras, Navamsha coordinates, and Vimshottari Mahadasha have been computed for <strong>{name || 'Querent'}</strong>.
             </span>
           </div>
           <span className="text-[0.65rem] font-mono opacity-80 shrink-0">
@@ -346,23 +354,35 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
               </div>
 
               {/* Chart Format Switcher */}
-              <div className="flex items-center gap-1 bg-black/30 p-1 rounded-lg border border-[#d4af37]/30">
+              <div className={`flex items-center gap-1 p-1 rounded-xl border ${
+                isDark 
+                  ? 'bg-black/40 border-[#d4af37]/30' 
+                  : 'bg-amber-100/70 border-[#c5a059]/50 shadow-sm'
+              }`}>
                 <button
                   onClick={() => setChartStyle('north')}
-                  className={`px-2.5 py-1 rounded text-[0.68rem] font-cinzel font-semibold transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-[0.68rem] font-cinzel font-bold transition-all cursor-pointer ${
                     chartStyle === 'north'
-                      ? 'bg-[#d4af37] text-black shadow-sm'
-                      : 'text-gray-400 hover:text-white'
+                      ? isDark
+                        ? 'bg-[#d4af37] text-black shadow-sm'
+                        : 'bg-gradient-to-r from-[#92400e] to-[#b45309] text-white shadow-sm'
+                      : isDark
+                        ? 'text-gray-400 hover:text-white'
+                        : 'text-[#78350f] hover:text-black'
                   }`}
                 >
                   North Indian
                 </button>
                 <button
                   onClick={() => setChartStyle('south')}
-                  className={`px-2.5 py-1 rounded text-[0.68rem] font-cinzel font-semibold transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-[0.68rem] font-cinzel font-bold transition-all cursor-pointer ${
                     chartStyle === 'south'
-                      ? 'bg-[#d4af37] text-black shadow-sm'
-                      : 'text-gray-400 hover:text-white'
+                      ? isDark
+                        ? 'bg-[#d4af37] text-black shadow-sm'
+                        : 'bg-gradient-to-r from-[#92400e] to-[#b45309] text-white shadow-sm'
+                      : isDark
+                        ? 'text-gray-400 hover:text-white'
+                        : 'text-[#78350f] hover:text-black'
                   }`}
                 >
                   South Indian
@@ -372,17 +392,21 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
 
             {/* North Indian Diamond SVG Chart */}
             {chartStyle === 'north' ? (
-              <div className="relative w-full aspect-square max-w-[420px] mx-auto my-3 bg-[#0d0904] rounded-xl border-2 border-[#d4af37] p-2 shadow-[0_0_25px_rgba(212,175,55,0.2)]">
+              <div className={`relative w-full aspect-square max-w-[420px] mx-auto my-3 rounded-2xl border-2 p-2.5 transition-all shadow-xl ${
+                isDark 
+                  ? 'bg-[#0d0904] border-[#d4af37] shadow-[0_0_25px_rgba(212,175,55,0.2)]' 
+                  : 'bg-[#fffef9] border-[#b45309] shadow-[0_4px_25px_rgba(180,130,40,0.15)]'
+              }`}>
                 <svg viewBox="0 0 400 400" className="w-full h-full select-none">
                   {/* Outer Frame */}
-                  <rect x="5" y="5" width="390" height="390" fill="none" stroke="#d4af37" strokeWidth="2" />
+                  <rect x="5" y="5" width="390" height="390" fill="none" stroke={isDark ? "#d4af37" : "#b45309"} strokeWidth="2" />
                   
                   {/* Diagonal Lines */}
-                  <line x1="5" y1="5" x2="395" y2="395" stroke="#d4af37" strokeWidth="1.5" strokeOpacity="0.85" />
-                  <line x1="395" y1="5" x2="5" y2="395" stroke="#d4af37" strokeWidth="1.5" strokeOpacity="0.85" />
+                  <line x1="5" y1="5" x2="395" y2="395" stroke={isDark ? "#d4af37" : "#b45309"} strokeWidth="1.5" strokeOpacity={isDark ? "0.85" : "0.75"} />
+                  <line x1="395" y1="5" x2="5" y2="395" stroke={isDark ? "#d4af37" : "#b45309"} strokeWidth="1.5" strokeOpacity={isDark ? "0.85" : "0.75"} />
                   
                   {/* Diamond in center */}
-                  <polygon points="200,5 395,200 200,395 5,200" fill="none" stroke="#d4af37" strokeWidth="1.5" strokeOpacity="0.85" />
+                  <polygon points="200,5 395,200 200,395 5,200" fill="none" stroke={isDark ? "#d4af37" : "#b45309"} strokeWidth="1.5" strokeOpacity={isDark ? "0.85" : "0.75"} />
 
                   {/* Render All 12 Houses Dynamically with Authentic Rashi Numbers & Calculated Planets */}
                   {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const).map((h) => {
@@ -397,11 +421,11 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
                           x={cfg.labelPos.x}
                           y={cfg.labelPos.y}
                           textAnchor="middle"
-                          fill="#d4af37"
+                          fill={isDark ? "#d4af37" : "#78350f"}
                           fontSize={h === 1 ? '11' : '10'}
                           fontFamily="Cinzel"
                           fontWeight={h === 1 || h === 4 || h === 7 || h === 10 ? 'bold' : 'normal'}
-                          opacity="0.9"
+                          opacity={isDark ? "0.9" : "1"}
                         >
                           {cfg.name}
                         </text>
@@ -411,10 +435,11 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
                           x={cfg.rashiPos.x}
                           y={cfg.rashiPos.y}
                           textAnchor="middle"
-                          fill="#c5a059"
+                          fill={isDark ? "#c5a059" : "#92400e"}
                           fontSize="9"
                           fontFamily="Cinzel"
-                          opacity="0.75"
+                          fontWeight="bold"
+                          opacity={isDark ? "0.75" : "0.9"}
                         >
                           [{houseRashiNum}]
                         </text>
@@ -424,13 +449,16 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
                           <g>
                             {planetsInHouse.map((p, pIdx) => {
                               const yOffset = (pIdx - (planetsInHouse.length - 1) / 2) * 14;
+                              const planetColor = isDark 
+                                ? (p.color || '#ffffff') 
+                                : (p.name === 'Sun' ? '#b45309' : p.name === 'Moon' ? '#1e3a8a' : p.name === 'Mars' ? '#991b1b' : p.name === 'Mercury' ? '#065f46' : p.name === 'Jupiter' ? '#78350f' : p.name === 'Venus' ? '#86198f' : p.name === 'Saturn' ? '#1e293b' : '#334155');
                               return (
                                 <text
                                   key={p.name}
                                   x={cfg.planetsPos.x}
                                   y={cfg.planetsPos.y + yOffset}
                                   textAnchor="middle"
-                                  fill={p.color || '#ffffff'}
+                                  fill={planetColor}
                                   fontSize="10"
                                   fontFamily="Cinzel"
                                   fontWeight="bold"
@@ -448,15 +476,21 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
               </div>
             ) : (
               /* South Indian Chart Box Format */
-              <div className="grid grid-cols-4 grid-rows-4 gap-1.5 w-full aspect-square max-w-[420px] mx-auto my-3 bg-[#0d0904] rounded-xl border-2 border-[#d4af37] p-2 shadow-[0_0_25px_rgba(212,175,55,0.2)]">
+              <div className={`grid grid-cols-4 grid-rows-4 gap-1.5 w-full aspect-square max-w-[420px] mx-auto my-3 rounded-2xl border-2 p-2.5 transition-all shadow-xl ${
+                isDark 
+                  ? 'bg-[#0d0904] border-[#d4af37] shadow-[0_0_25px_rgba(212,175,55,0.2)]' 
+                  : 'bg-[#fffef9] border-[#b45309] shadow-[0_4px_25px_rgba(180,130,40,0.15)]'
+              }`}>
                 {SOUTH_RASHI_GRID.map((box, idx) => {
                   if (box.sign === 'Center') {
                     if (idx === 5) {
                       return (
-                        <div key={idx} className="col-span-2 row-span-2 bg-black/60 border border-[#d4af37]/40 flex flex-col items-center justify-center p-2 rounded-lg text-center">
-                          <span className="text-xs font-cinzel font-bold text-[#d4af37]">RASI KUNDLI</span>
-                          <span className="text-[0.65rem] font-serif text-gray-300 mt-0.5">{kundli.ascendant} Lagna</span>
-                          <span className="text-[0.6rem] font-mono text-amber-400/90 mt-0.5">{kundli.currentDasha}</span>
+                        <div key={idx} className={`col-span-2 row-span-2 border flex flex-col items-center justify-center p-2 rounded-xl text-center ${
+                          isDark ? 'bg-black/60 border-[#d4af37]/40' : 'bg-amber-100/70 border-[#c5a059]/60'
+                        }`}>
+                          <span className={`text-xs font-cinzel font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#78350f]'}`}>RASI KUNDLI</span>
+                          <span className={`text-[0.65rem] font-serif mt-0.5 ${isDark ? 'text-gray-300' : 'text-[#451a03]'}`}>{kundli.ascendant} Lagna</span>
+                          <span className={`text-[0.6rem] font-mono mt-0.5 font-semibold ${isDark ? 'text-amber-400/90' : 'text-[#92400e]'}`}>{kundli.currentDasha}</span>
                         </div>
                       );
                     }
@@ -470,23 +504,32 @@ export const KundliScreen: React.FC<KundliScreenProps> = ({ theme, user }) => {
 
                   return (
                     <div key={idx} className={`border p-1.5 flex flex-col justify-between rounded-lg text-[0.68rem] transition-all ${
-                      isLagnaSign ? 'border-[#d4af37] bg-[#d4af37]/15' : 'border-[#d4af37]/35 bg-black/40'
+                      isLagnaSign 
+                        ? (isDark ? 'border-[#d4af37] bg-[#d4af37]/15' : 'border-[#b45309] bg-amber-200/70 ring-1 ring-[#b45309]') 
+                        : (isDark ? 'border-[#d4af37]/35 bg-black/40' : 'border-[#c5a059]/40 bg-white shadow-xs')
                     }`}>
                       <div className="flex items-center justify-between gap-0.5">
-                        <span className="font-cinzel text-[0.62rem] text-[#d4af37] font-semibold">{box.sign}</span>
+                        <span className={`font-cinzel text-[0.62rem] font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#78350f]'}`}>{box.sign}</span>
                         {isLagnaSign && (
-                          <span className="text-[0.55rem] font-mono font-bold text-amber-300 px-1 rounded bg-[#d4af37]/30">
+                          <span className={`text-[0.55rem] font-mono font-bold px-1 rounded ${
+                            isDark ? 'text-amber-300 bg-[#d4af37]/30' : 'text-white bg-[#92400e]'
+                          }`}>
                             ASC
                           </span>
                         )}
                       </div>
                       
                       <div className="flex flex-col gap-0.5 mt-0.5 overflow-hidden">
-                        {planetsInRashi.map(p => (
-                          <span key={p.name} className="text-[0.6rem] font-serif font-bold truncate" style={{ color: p.color || '#ffffff' }}>
-                            {p.symbol} {p.name.substring(0, 4)}{p.isRetrograde ? 'ᴿ' : ''}
-                          </span>
-                        ))}
+                        {planetsInRashi.map(p => {
+                          const planetColor = isDark 
+                            ? (p.color || '#ffffff') 
+                            : (p.name === 'Sun' ? '#b45309' : p.name === 'Moon' ? '#1e3a8a' : p.name === 'Mars' ? '#991b1b' : p.name === 'Mercury' ? '#065f46' : p.name === 'Jupiter' ? '#78350f' : p.name === 'Venus' ? '#86198f' : p.name === 'Saturn' ? '#1e293b' : '#334155');
+                          return (
+                            <span key={p.name} className="text-[0.6rem] font-serif font-bold truncate" style={{ color: planetColor }}>
+                              {p.symbol} {p.name.substring(0, 4)}{p.isRetrograde ? 'ᴿ' : ''}
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                   );

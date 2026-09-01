@@ -278,7 +278,7 @@ ${profile.timeline.map(t => `[${t.quarter}] ${t.title}: ${t.description}`).join(
           </div>
           <button 
             onClick={() => setShowSuccessToast(null)} 
-            className="text-gray-400 hover:text-white cursor-pointer"
+            className={`cursor-pointer ${isDark ? 'text-emerald-400 hover:text-white' : 'text-emerald-700 hover:text-emerald-900'}`}
           >
             <X className="w-3.5 h-3.5" />
           </button>

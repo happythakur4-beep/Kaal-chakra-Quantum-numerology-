@@ -28,6 +28,7 @@ import { AstroSageDrawer } from './components/AstroSageDrawer';
 import { AstroSageFeatureModal } from './components/AstroSageFeatureModal';
 import { AstrologerChatModal } from './components/AstrologerChatModal';
 import { LandingHeroScreen } from './components/Screens/LandingHeroScreen';
+import { CosmicPlanetaryAlignmentHomepage } from './components/Screens/CosmicPlanetaryAlignmentHomepage';
 import { InstitutePortalScreen } from './components/Screens/InstitutePortalScreen';
 import { DestinyReportScreen } from './components/Screens/DestinyReportScreen';
 import { StudentDashboardScreen } from './components/Screens/StudentDashboardScreen';
@@ -53,7 +54,19 @@ import { TeslaPortal369Screen } from './components/Screens/TeslaPortal369Screen'
 import { TeslaCyberPortalNexus } from './components/Tesla369/TeslaCyberPortalNexus';
 import { BlackHoleWarpTransition } from './components/Tesla369/BlackHoleWarpTransition';
 import { UnifiedCosmicWormholeEngine } from './components/CosmicTransitionEngine/UnifiedCosmicWormholeEngine';
+import { AndroidBottomNav } from './components/AndroidBottomNav';
+import { AndroidInstallPrompt } from './components/AndroidInstallPrompt';
+import { AndroidExportModal } from './components/AndroidExportModal';
+import { SocialShareModal } from './components/SocialShareModal';
+import { MindHealingScreen } from './components/Screens/MindHealingScreen';
+import { SoundHealingSuite } from './components/SoundHealing/SoundHealingSuite';
+import { MemoryHealingHypnosisScreen } from './components/Screens/MemoryHealingHypnosisScreen';
+import { CosmicEnergyBalanceScreen } from './components/Screens/CosmicEnergyBalanceScreen';
+import { MindWellnessPortalModal } from './components/MindWellness/MindWellnessPortalModal';
+import { MindWellness3DIcon } from './components/MindWellness/MindWellness3DIcon';
 import { motion, AnimatePresence } from 'motion/react';
+import { MantraAudioPlayer } from "./components/MantraAudioPlayer";
+import { sanctumTracker } from './utils/sanctumEngagementTracker';
 
 export function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('landing');
@@ -69,10 +82,13 @@ export function App() {
   const [courses, setCourses] = useState(ALL_COURSES);
   
   // Modals & Drawers state
+  const [isMindWellnessPortalModalOpen, setIsMindWellnessPortalModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAstrologerChatOpen, setIsAstrologerChatOpen] = useState(false);
   const [activeAstrologerId, setActiveAstrologerId] = useState<string | undefined>(undefined);
+  const [isAndroidModalOpen, setIsAndroidModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   
   const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<AstroSageCategory | null>(null);
@@ -169,6 +185,16 @@ export function App() {
     setIsAstrologerChatOpen(true);
   };
 
+  // Real-Time Karma Balance Updater
+  const handleUpdateUserKarma = (newPunya: number, newPapa: number) => {
+    setUser(prev => ({
+      ...prev,
+      punyaScore: newPunya,
+      papaScore: newPapa,
+      karmaScore: newPunya - newPapa,
+    }));
+  };
+
   // Open Feature Modal from Category or Grid Tile
   const handleOpenCategorySubModal = (category: AstroSageCategory | null, subFeature?: SubFeatureItem) => {
     setSelectedCategory(category);
@@ -188,6 +214,9 @@ export function App() {
   const handleNavigate = (targetScreen: ScreenType) => {
     if (targetScreen === currentScreen) return;
 
+    // Track visit in sanctum engagement system
+    sanctumTracker.recordVisit(targetScreen);
+
     if (targetScreen === 'tesla-369') {
       setIsBlackHoleWarpPlaying(true);
       setCurrentScreen('tesla-369');
@@ -201,7 +230,7 @@ export function App() {
     // Midpoint switch: swap screen state while wormhole vortex is at peak intensity
     setTimeout(() => {
       setCurrentScreen(targetScreen);
-    }, 550);
+    }, 220);
   };
 
   const handleTransitionFinish = () => {
@@ -220,7 +249,7 @@ export function App() {
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-500 relative font-sans ${
-      theme === 'dark' ? 'bg-[#07070b] text-gray-100' : 'bg-[#faf7ee] text-[#3b2b0a]'
+      theme === 'dark' ? 'bg-[#07070b] text-gray-100' : 'bg-[#1e1b4b] text-amber-50'
     }`}>
       {/* Unified Cosmic Wormhole & Nebula Drift Transition Engine */}
       <UnifiedCosmicWormholeEngine
@@ -237,7 +266,7 @@ export function App() {
       )}
 
       {/* Sacred Rotating Sri Yantra Mandala Canvas Background */}
-      <MandalaBackground theme={theme} />
+      <MandalaBackground theme={theme} activeAura={user.activeAura} />
 
       {/* Primary Navigation Header */}
       <Header
@@ -250,6 +279,10 @@ export function App() {
         onOpenAstrologerChat={handleOpenAstrologerChat}
         onOpenFeatureModal={handleOpenGridTileModal}
         onOpenCourse={handleOpenCourse}
+        onOpenAndroidModal={() => setIsAndroidModalOpen(true)}
+        onOpenShareModal={() => setIsShareModalOpen(true)}
+        onOpenMindWellnessPortal={() => setIsMindWellnessPortalModalOpen(true)}
+        onOpenDrawer={() => setIsDrawerOpen(true)}
       />
 
       {/* Screen Router Container with Continuous Morphing Animation */}
@@ -264,14 +297,19 @@ export function App() {
             className="flex-1 flex flex-col w-full"
           >
             {currentScreen === 'landing' && (
-              <LandingHeroScreen
+              <CosmicPlanetaryAlignmentHomepage
                 theme={theme}
+                user={user}
                 activeAura={user.activeAura}
                 onNavigate={handleNavigate}
                 onUnlockReport={handleHeroUnlock}
                 onOpenDrawer={() => setIsDrawerOpen(true)}
                 onOpenAstrologerChat={handleOpenAstrologerChat}
                 onOpenFeatureModal={handleOpenGridTileModal}
+                onOpenShareModal={() => setIsShareModalOpen(true)}
+                onOpenMindWellnessPortal={() => setIsMindWellnessPortalModalOpen(true)}
+                onUpdateUserKarma={handleUpdateUserKarma}
+                onSelectAura={handleSelectAura}
               />
             )}
 
@@ -286,6 +324,42 @@ export function App() {
                 onUnlockDestinyReport={handleUnlockDestinyReport}
                 onViewReport={() => handleNavigate('report')}
                 onBookConsultation={() => handleNavigate('consultations')}
+              />
+            )}
+
+            {currentScreen === 'mind-healing' && (
+              <MindHealingScreen
+                theme={theme}
+                userProfile={user}
+                onNavigate={handleNavigate}
+                onOpenAstrologerChat={handleOpenAstrologerChat}
+              />
+            )}
+
+            {currentScreen === 'energy-balance' && (
+              <CosmicEnergyBalanceScreen
+                theme={theme}
+                user={user}
+                onNavigate={handleNavigate}
+                onUpdateUserKarma={handleUpdateUserKarma}
+              />
+            )}
+
+            {currentScreen === 'sound-healing' && (
+              <SoundHealingSuite
+                theme={theme}
+                userProfile={user}
+                onNavigate={handleNavigate}
+                onOpenAstrologerChat={handleOpenAstrologerChat}
+              />
+            )}
+
+            {currentScreen === 'memory-hypnosis' && (
+              <MemoryHealingHypnosisScreen
+                theme={theme}
+                userProfile={user}
+                onNavigate={handleNavigate}
+                onOpenAstrologerChat={handleOpenAstrologerChat}
               />
             )}
 
@@ -395,14 +469,6 @@ export function App() {
               />
             )}
 
-            {currentScreen === 'tesla-369' && (
-              <TeslaPortal369Screen
-                theme={theme}
-                user={user}
-                onTriggerBlackHoleWarp={() => setIsBlackHoleWarpPlaying(true)}
-              />
-            )}
-
             {currentScreen === 'student' && (
               <StudentDashboardScreen
                 theme={theme}
@@ -445,6 +511,7 @@ export function App() {
       <Footer
         theme={theme}
         onNavigate={handleNavigate}
+        onOpenShareModal={() => setIsShareModalOpen(true)}
       />
 
       {/* AstroSage Slide-Out Accordion Drawer Menu (Screenshot 1) */}
@@ -486,6 +553,76 @@ export function App() {
         initialName={user.name}
         initialEmail={user.email}
       />
+
+      {/* Persistent Mantra Audio Player Floating Sanctuary */}
+      <MantraAudioPlayer theme={theme} />
+
+      {/* Android Native-Experience Bottom Navigation Bar (Mobile / Touch Devices) */}
+      <AndroidBottomNav
+        currentScreen={currentScreen}
+        onNavigate={handleNavigate}
+        onOpenDrawer={() => setIsDrawerOpen(true)}
+      />
+
+      {/* Android 1-Tap PWA / APK Install Floating Banner */}
+      <AndroidInstallPrompt
+        onOpenApkGuide={() => setIsAndroidModalOpen(true)}
+      />
+
+      {/* Android Native APK & PWA Packaging Guide Modal */}
+      <AndroidExportModal
+        isOpen={isAndroidModalOpen}
+        onClose={() => setIsAndroidModalOpen(false)}
+      />
+
+      {/* Cosmic Social Share Modal (Facebook, WhatsApp, Instagram & Native) */}
+      <SocialShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
+
+      {/* Distinct 3D Mind Wellness Holographic Portal Window / Matrix */}
+      <MindWellnessPortalModal
+        isOpen={isMindWellnessPortalModalOpen}
+        onClose={() => setIsMindWellnessPortalModalOpen(false)}
+        theme={theme}
+        userProfile={user}
+        onNavigateToFullChamber={(screen) => {
+          setIsMindWellnessPortalModalOpen(false);
+          handleNavigate(screen);
+        }}
+      />
+
+      {/* Persistent Floating 3D Mind Wellness Portal Launcher Pill (Left-aligned to prevent overlap) */}
+      {currentScreen !== 'mind-healing' && (
+        <div className="fixed bottom-20 sm:bottom-6 left-4 sm:left-6 z-40">
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.94 }}
+            className="flex items-center gap-2 p-1.5 sm:p-2 rounded-full bg-black/90 border border-emerald-400/80 shadow-[0_0_25px_rgba(16,185,129,0.55)] backdrop-blur-md cursor-pointer group"
+            onClick={() => setIsMindWellnessPortalModalOpen(true)}
+            title="Open Mind Wellness: 3D Holographic Portal Window (528Hz)"
+          >
+            <MindWellness3DIcon
+              size={36}
+              interactive={true}
+              showGlow={true}
+              showBadge={true}
+              badgeText="528"
+            />
+            <div className="hidden md:flex flex-col pr-3 text-left select-none">
+              <span className="text-[11px] font-cinzel font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-cyan-300 to-amber-200 uppercase tracking-wider">
+                Mind Portal
+              </span>
+              <span className="text-[9px] font-mono text-emerald-400 font-medium">
+                Cellular Telemetry
+              </span>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

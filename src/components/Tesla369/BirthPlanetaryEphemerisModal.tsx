@@ -5,6 +5,7 @@ import {
   NatalEphemerisData,
   NatalPlanetPosition,
   ZODIAC_METADATA,
+  POPULAR_LOCATIONS,
 } from '../../utils/planetaryEphemeris';
 import { cosmicAudio } from '../../utils/audioSynthesizer';
 import {
@@ -25,37 +26,45 @@ import {
   Info,
   X,
   Volume2,
+  Navigation,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 
 interface BirthPlanetaryEphemerisModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
-  onApplyBirthPositions: (ephemeris: NatalEphemerisData) => void;
-  onFocusPlanet: (planetId: string) => void;
-  theme: ThemeMode;
+  onApplyBirthPositions?: (ephemeris: NatalEphemerisData) => void;
+  onApplyEphemeris?: (ephemeris: NatalEphemerisData) => void;
+  onFocusPlanet?: (planetId: string) => void;
+  theme?: ThemeMode;
   initialDate?: string;
   initialTime?: string;
+  initialCity?: string;
+  initialData?: NatalEphemerisData;
 }
 
 export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModalProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
   onApplyBirthPositions,
+  onApplyEphemeris,
   onFocusPlanet,
-  theme,
+  theme = 'dark',
   initialDate = '1996-07-14',
   initialTime = '06:45',
+  initialCity = 'Varanasi, India',
+  initialData,
 }) => {
-  const [birthDate, setBirthDate] = useState<string>(initialDate);
-  const [birthTime, setBirthTime] = useState<string>(initialTime);
-  const [birthCity, setBirthCity] = useState<string>('New Delhi, India');
+  const [birthDate, setBirthDate] = useState<string>(initialData?.birthDate || initialDate);
+  const [birthTime, setBirthTime] = useState<string>(initialData?.birthTime || initialTime);
+  const [birthCity, setBirthCity] = useState<string>(initialData?.birthLocation || initialData?.city || initialCity);
   const [selectedPlanet, setSelectedPlanet] = useState<NatalPlanetPosition | null>(null);
   const [ephemerisData, setEphemerisData] = useState<NatalEphemerisData>(() =>
-    calculateBirthPlanetaryPositions(initialDate, initialTime, 'New Delhi, India')
+    initialData || calculateBirthPlanetaryPositions(initialDate, initialTime, initialCity)
   );
   const [activeFilter, setActiveFilter] = useState<'all' | 'inner' | 'outer' | 'nodes'>('all');
+  const [isLocating, setIsLocating] = useState(false);
 
   // Recalculate whenever date, time or city changes
   useEffect(() => {
@@ -69,13 +78,19 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
   if (!isOpen) return null;
 
   const handleApplyToUniverse = () => {
-    onApplyBirthPositions(ephemerisData);
+    cosmicAudio.playCyberWarp();
+    if (onApplyBirthPositions) {
+      onApplyBirthPositions(ephemerisData);
+    }
+    if (onApplyEphemeris) {
+      onApplyEphemeris(ephemerisData);
+    }
     try {
       confetti({
-        particleCount: 40,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#ffd700', '#38bdf8', '#c084fc', '#f472b6'],
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.55 },
+        colors: ['#ffd700', '#38bdf8', '#c084fc', '#f472b6', '#34d399'],
       });
     } catch {}
     onClose();
@@ -90,13 +105,45 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
     const min = String(now.getMinutes()).padStart(2, '0');
     setBirthDate(`${yyyy}-${mm}-${dd}`);
     setBirthTime(`${hh}:${min}`);
-    setBirthCity('Current Location (Live)');
+    setBirthCity('New Delhi, India');
+    cosmicAudio.playCyberKeystroke();
   };
 
   const handleSetNikolaTeslaBirth = () => {
     setBirthDate('1856-07-10');
     setBirthTime('00:00');
-    setBirthCity('Smiljan, Croatia (Midnight Lightning Storm)');
+    setBirthCity('Smiljan, Croatia');
+    cosmicAudio.playCyberKeystroke();
+  };
+
+  const handleSetLordKrishnaBirth = () => {
+    setBirthDate('1996-08-25'); // Symbolic Janmashtami Ashtami
+    setBirthTime('00:00');
+    setBirthCity('Varanasi, India');
+    cosmicAudio.playCyberKeystroke();
+  };
+
+  const handleSetVivekanandaBirth = () => {
+    setBirthDate('1863-01-12');
+    setBirthTime('06:33');
+    setBirthCity('Kolkata, India');
+    cosmicAudio.playCyberKeystroke();
+  };
+
+  const handleDetectLocation = () => {
+    if (navigator.geolocation) {
+      setIsLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          setBirthCity('Current Geolocation (Live)');
+          setIsLocating(false);
+        },
+        () => {
+          setBirthCity('New Delhi, India');
+          setIsLocating(false);
+        }
+      );
+    }
   };
 
   const filteredPlanets = ephemerisData.planets.filter((p) => {
@@ -106,32 +153,50 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
     return true;
   });
 
+  const popularCities = [
+    'Varanasi, India',
+    'New Delhi, India',
+    'Mumbai, India',
+    'Bengaluru, India',
+    'Kolkata, India',
+    'Jaipur, India',
+    'Ayodhya, India',
+    'Haridwar, India',
+    'Ujjain, India',
+    'London, UK',
+    'New York, USA',
+    'Dubai, UAE',
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-xl overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-2xl overflow-y-auto font-sans">
       <motion.div
         initial={{ opacity: 0, scale: 0.94, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.94, y: 20 }}
-        className="relative w-full max-w-5xl bg-[#090514]/95 border border-amber-500/40 rounded-3xl shadow-[0_0_50px_rgba(251,191,36,0.25)] p-4 sm:p-6 my-auto max-h-[92vh] overflow-y-auto no-scrollbar"
+        className="relative w-full max-w-5xl bg-[#090514]/95 border border-amber-500/40 rounded-3xl shadow-[0_0_60px_rgba(251,191,36,0.3)] p-4 sm:p-6 my-auto max-h-[92vh] overflow-y-auto no-scrollbar"
       >
         {/* Top Header */}
-        <div className="flex items-start justify-between border-b border-amber-500/20 pb-4 mb-6">
+        <div className="flex items-start justify-between border-b border-amber-500/20 pb-4 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/30 to-purple-600/30 border border-amber-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/30 to-cyan-600/30 border border-amber-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.3)]">
               <Orbit className="w-6 h-6 text-[#ffd700] animate-spin-slow" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-500/20 text-[#ffd700] border border-amber-500/30">
-                  Birth Ephemeris Engine
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-500/20 text-[#ffd700] border border-amber-500/30 font-mono">
+                  369 NATAL EPHEMERIS ALIGNMENT
                 </span>
-                <span className="text-xs text-cyan-400 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> Astronomical Precision
+                <span className="text-xs text-cyan-400 flex items-center gap-1 font-mono">
+                  <Sparkles className="w-3 h-3" /> जन्म समय ग्रह स्थिति
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-cinzel font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-cyan-300">
-                Planetary Positions at Birth Date & Time
+                Align 369 Planets to Your Exact Birth Moment
               </h2>
+              <p className="text-xs text-gray-300 mt-0.5">
+                अपनी जन्म तिथि, समय और स्थान दर्ज करें — सभी ग्रह स्वतः उसी अलाइनमेंट में आ जाएंगे जिस समय आपका जन्म हुआ था।
+              </p>
             </div>
           </div>
           <button
@@ -143,18 +208,18 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
         </div>
 
         {/* Input Controls Panel */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 bg-purple-950/20 border border-purple-500/20 rounded-2xl p-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 bg-purple-950/20 border border-purple-500/25 rounded-2xl p-3.5">
           {/* Date of Birth Input */}
           <div>
             <label className="text-xs font-semibold text-amber-300/90 flex items-center gap-1.5 mb-1.5">
               <Calendar className="w-3.5 h-3.5 text-amber-400" />
-              Date of Birth
+              <span>Date of Birth (जन्म तिथि)</span>
             </label>
             <input
               type="date"
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
-              className="w-full bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-amber-400 transition"
+              className="w-full bg-black/70 border border-amber-500/30 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-amber-400 transition"
             />
           </div>
 
@@ -162,84 +227,121 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
           <div>
             <label className="text-xs font-semibold text-amber-300/90 flex items-center gap-1.5 mb-1.5">
               <Clock className="w-3.5 h-3.5 text-cyan-400" />
-              Time of Birth (Exact HH:MM)
+              <span>Time of Birth (जन्म समय HH:MM)</span>
             </label>
             <input
               type="time"
               value={birthTime}
               onChange={(e) => setBirthTime(e.target.value)}
-              className="w-full bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-400 transition"
+              className="w-full bg-black/70 border border-amber-500/30 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-400 transition"
             />
           </div>
 
           {/* Birth Location */}
           <div>
-            <label className="text-xs font-semibold text-amber-300/90 flex items-center gap-1.5 mb-1.5">
-              <MapPin className="w-3.5 h-3.5 text-purple-400" />
-              Birth City / Coordinate
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-amber-300/90 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-purple-400" />
+                <span>Birth Place / City (जन्म स्थान)</span>
+              </label>
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                className="text-[10px] text-cyan-300 hover:text-cyan-200 flex items-center gap-1 cursor-pointer"
+              >
+                <Navigation className="w-2.5 h-2.5" />
+                {isLocating ? 'Locating...' : 'GPS Detect'}
+              </button>
+            </div>
             <input
               type="text"
               value={birthCity}
               onChange={(e) => setBirthCity(e.target.value)}
-              placeholder="e.g. Mumbai, New York, London"
-              className="w-full bg-black/60 border border-amber-500/30 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400 transition"
+              placeholder="e.g. Varanasi, New Delhi, Mumbai"
+              className="w-full bg-black/70 border border-amber-500/30 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400 transition"
             />
           </div>
         </div>
 
-        {/* Quick Epoch Presets */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">Quick Epochs:</span>
+        {/* Popular City Quick-Select Pills */}
+        <div className="mb-4 flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <span className="text-[11px] text-gray-400 whitespace-nowrap flex items-center gap-1">
+            <Globe className="w-3 h-3 text-cyan-400" /> Quick City:
+          </span>
+          {popularCities.map((city) => (
+            <button
+              key={city}
+              onClick={() => setBirthCity(city)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition cursor-pointer ${
+                birthCity === city
+                  ? 'bg-amber-500/30 text-amber-200 border border-amber-400/60 font-bold'
+                  : 'bg-black/40 text-gray-300 hover:text-white border border-white/10 hover:border-amber-500/30'
+              }`}
+            >
+              {city.split(',')[0]}
+            </button>
+          ))}
+        </div>
+
+        {/* Quick Epoch Presets & Apply Button */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5 mb-5 p-2.5 bg-black/40 border border-white/10 rounded-2xl">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-gray-400 font-mono">Cosmic Presets:</span>
             <button
               onClick={handleSetCurrentLiveSky}
-              className="px-3 py-1 rounded-lg text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 transition cursor-pointer flex items-center gap-1"
+              className="px-2.5 py-1 rounded-lg text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 transition cursor-pointer flex items-center gap-1"
             >
-              <RefreshCw className="w-3 h-3" /> Today's Live Sky
+              <RefreshCw className="w-3 h-3" /> Live Sky Today
             </button>
             <button
               onClick={handleSetNikolaTeslaBirth}
-              className="px-3 py-1 rounded-lg text-xs bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 transition cursor-pointer flex items-center gap-1"
+              className="px-2.5 py-1 rounded-lg text-xs bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 transition cursor-pointer flex items-center gap-1"
             >
-              <Zap className="w-3 h-3" /> Nikola Tesla Birth (1856)
+              <Zap className="w-3 h-3" /> Nikola Tesla (1856)
+            </button>
+            <button
+              onClick={handleSetVivekanandaBirth}
+              className="px-2.5 py-1 rounded-lg text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition cursor-pointer flex items-center gap-1"
+            >
+              <Sparkles className="w-3 h-3" /> Swami Vivekananda (1863)
             </button>
           </div>
 
-          {/* Apply to 3D View Button */}
+          {/* Master Apply to 3D View Button */}
           <button
             onClick={handleApplyToUniverse}
-            className="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-amber-500 via-amber-400 to-cyan-400 text-black hover:opacity-95 shadow-[0_0_25px_rgba(251,191,36,0.4)] transition cursor-pointer flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-400 text-black hover:brightness-110 shadow-[0_0_30px_rgba(251,191,36,0.5)] transition-all cursor-pointer flex items-center justify-center gap-2 uppercase tracking-wider font-mono"
           >
-            <Orbit className="w-4 h-4" /> Align 3D Universe to My Birth Chart
+            <Orbit className="w-4 h-4 animate-spin-slow" />
+            <span>✨ AUTO-ALIGN 369 PLANETS TO BIRTH MOMENT</span>
           </button>
         </div>
 
         {/* Natal Ephemeris Summary Banner */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6 p-3 bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-cyan-500/10 border border-amber-500/25 rounded-2xl">
-          <div className="text-center p-2 rounded-xl bg-black/40">
-            <div className="text-[10px] uppercase text-gray-400 font-semibold">Ascendant (Lagna)</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5 p-3 bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-cyan-500/15 border border-amber-500/30 rounded-2xl shadow-inner">
+          <div className="text-center p-2 rounded-xl bg-black/50 border border-amber-500/20">
+            <div className="text-[10px] uppercase text-gray-400 font-semibold">Ascendant (लग्न)</div>
             <div className="text-sm font-bold text-amber-300 flex items-center justify-center gap-1">
               <span>{ephemerisData.ascendant.sign}</span>
               <span className="text-xs text-gray-400">{ephemerisData.ascendant.formattedDegree}</span>
             </div>
           </div>
-          <div className="text-center p-2 rounded-xl bg-black/40">
-            <div className="text-[10px] uppercase text-gray-400 font-semibold">Sun Sign (Surya)</div>
+          <div className="text-center p-2 rounded-xl bg-black/50 border border-amber-500/20">
+            <div className="text-[10px] uppercase text-gray-400 font-semibold">Sun Sign (सूर्य राशि)</div>
             <div className="text-sm font-bold text-[#ffd700] flex items-center justify-center gap-1">
               <Sun className="w-3.5 h-3.5 text-amber-400" />
               <span>{ephemerisData.sunSign}</span>
             </div>
           </div>
-          <div className="text-center p-2 rounded-xl bg-black/40">
-            <div className="text-[10px] uppercase text-gray-400 font-semibold">Moon Sign (Rashi)</div>
+          <div className="text-center p-2 rounded-xl bg-black/50 border border-cyan-500/20">
+            <div className="text-[10px] uppercase text-gray-400 font-semibold">Moon Sign (चन्द्र राशि)</div>
             <div className="text-sm font-bold text-cyan-300 flex items-center justify-center gap-1">
               <Moon className="w-3.5 h-3.5 text-cyan-300" />
               <span>{ephemerisData.moonSign}</span>
             </div>
           </div>
-          <div className="text-center p-2 rounded-xl bg-black/40">
-            <div className="text-[10px] uppercase text-gray-400 font-semibold">Birth Nakshatra</div>
+          <div className="text-center p-2 rounded-xl bg-black/50 border border-purple-500/20">
+            <div className="text-[10px] uppercase text-gray-400 font-semibold">Birth Nakshatra (नक्षत्र)</div>
             <div className="text-sm font-bold text-purple-300 flex items-center justify-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-purple-400" />
               <span>{ephemerisData.nakshatra}</span>
@@ -248,11 +350,11 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-3">
           {[
-            { id: 'all', label: 'All 10 Celestial Bodies' },
+            { id: 'all', label: 'All 10 Grahas (सभी ग्रह)' },
             { id: 'inner', label: 'Inner Planets (Sun, Moon, Mars...)' },
-            { id: 'outer', label: 'Outer Gas Giants (Jupiter, Saturn...)' },
+            { id: 'outer', label: 'Outer Giants (Jupiter, Saturn...)' },
             { id: 'nodes', label: 'Lunar Nodes (Rahu / Ketu)' },
           ].map((tab) => (
             <button
@@ -270,14 +372,14 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
         </div>
 
         {/* Detailed Planetary Positions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 mb-5">
           {filteredPlanets.map((planet) => {
             const isSelected = selectedPlanet?.id === planet.id;
             return (
               <div
                 key={planet.id}
                 onClick={() => setSelectedPlanet(planet)}
-                className={`p-3.5 rounded-2xl transition-all cursor-pointer border relative overflow-hidden ${
+                className={`p-3 rounded-2xl transition-all cursor-pointer border relative overflow-hidden ${
                   isSelected
                     ? 'bg-gradient-to-br from-purple-900/40 via-amber-950/30 to-black border-[#ffd700] shadow-[0_0_20px_rgba(251,191,36,0.3)]'
                     : 'bg-black/40 hover:bg-black/60 border-white/10 hover:border-amber-500/40'
@@ -301,7 +403,7 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
                         <span>{planet.name}</span>
                         {planet.isRetrograde && (
                           <span className="px-1.5 py-0.2 rounded text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 font-mono">
-                            RETROGRADE
+                            वक्र (R)
                           </span>
                         )}
                       </div>
@@ -313,20 +415,20 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
                     <div className="text-xs font-mono font-bold text-cyan-300">
                       {planet.formattedDegree}
                     </div>
-                    <div className="text-[10px] text-gray-400">House {planet.house}</div>
+                    <div className="text-[10px] text-gray-400">House #{planet.house} (भाव)</div>
                   </div>
                 </div>
 
                 {/* Sign & Nakshatra Specs */}
                 <div className="grid grid-cols-2 gap-1.5 p-2 rounded-xl bg-black/50 border border-white/5 text-[11px] mb-2">
                   <div>
-                    <span className="text-gray-400 text-[10px]">Zodiac Sign:</span>
-                    <div className="font-semibold text-amber-200">{planet.sign}</div>
+                    <span className="text-gray-400 text-[10px]">Rashi (राशि):</span>
+                    <div className="font-semibold text-amber-200">{planet.sign} ({planet.signName.split(' ')[0]})</div>
                   </div>
                   <div>
-                    <span className="text-gray-400 text-[10px]">Nakshatra (Pada):</span>
+                    <span className="text-gray-400 text-[10px]">Nakshatra (नक्षत्र):</span>
                     <div className="font-semibold text-purple-200">
-                      {planet.nakshatra} (P{planet.nakshatraPada})
+                      {planet.nakshatra} (चरण {planet.nakshatraPada})
                     </div>
                   </div>
                 </div>
@@ -334,18 +436,20 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
                 {/* Actions & Deep Focus */}
                 <div className="flex items-center justify-between pt-1 text-[11px]">
                   <span className="text-gray-400 text-[10px] font-mono">
-                    Orbital Longitude: {planet.eclipticLongitude.toFixed(1)}°
+                    Longitude: {planet.eclipticLongitude.toFixed(1)}°
                   </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onFocusPlanet(planet.id);
-                      onClose();
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 flex items-center gap-1 transition"
-                  >
-                    <Eye className="w-3 h-3" /> Zoom 3D
-                  </button>
+                  {onFocusPlanet && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onFocusPlanet(planet.id);
+                        onClose();
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 flex items-center gap-1 transition cursor-pointer"
+                    >
+                      <Eye className="w-3 h-3" /> Zoom 3D
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -354,17 +458,17 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
 
         {/* Selected Planet Deep Interpretation */}
         {selectedPlanet && (
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-cyan-500/10 border border-amber-500/30">
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-cyan-500/10 border border-amber-500/30">
             <div className="flex items-center gap-2 mb-1">
               <Sparkles className="w-4 h-4 text-[#ffd700]" />
-              <span className="text-xs font-bold text-[#ffd700] uppercase tracking-wider">
-                Natal Harmonic Resonance: {selectedPlanet.name} in {selectedPlanet.sign}
+              <span className="text-xs font-bold text-[#ffd700] uppercase tracking-wider font-mono">
+                Natal Resonance: {selectedPlanet.name} in {selectedPlanet.sign}
               </span>
             </div>
             <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-              {selectedPlanet.interpretation} At your birth moment ({birthDate} at {birthTime}), {selectedPlanet.name} resided at{' '}
-              <span className="text-amber-300 font-semibold">{selectedPlanet.formattedDegree} of {selectedPlanet.sign}</span>, anchored in the asterism of{' '}
-              <span className="text-purple-300 font-semibold">{selectedPlanet.nakshatra} (Pada {selectedPlanet.nakshatraPada})</span>, energizing your{' '}
+              {selectedPlanet.interpretation} At your birth moment ({birthDate} at {birthTime} in {birthCity}), {selectedPlanet.name} resided at{' '}
+              <span className="text-amber-300 font-semibold">{selectedPlanet.formattedDegree} of {selectedPlanet.sign}</span>, in the nakshatra of{' '}
+              <span className="text-purple-300 font-semibold">{selectedPlanet.nakshatra} (Pada {selectedPlanet.nakshatraPada})</span>, illuminating your{' '}
               <span className="text-cyan-300 font-semibold">House #{selectedPlanet.house}</span>.
             </p>
           </div>
@@ -373,3 +477,4 @@ export const BirthPlanetaryEphemerisModal: React.FC<BirthPlanetaryEphemerisModal
     </div>
   );
 };
+

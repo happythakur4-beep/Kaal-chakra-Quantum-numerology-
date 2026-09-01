@@ -14,6 +14,8 @@ import {
 } from '../../data/karmaData';
 import { ThemeMode, ScreenType } from '../../types';
 import { cosmicAudio } from '../../utils/audioSynthesizer';
+import { KarmaGitaSection } from './KarmaGitaSection';
+import { GitaConfessionSanctum } from '../GitaConfession/GitaConfessionSanctum';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Scale,
@@ -65,7 +67,7 @@ export const KarmaScreen: React.FC<KarmaScreenProps> = ({ theme, onNavigate }) =
   const [newProfileBirthCity, setNewProfileBirthCity] = useState('New Delhi, India');
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'ledger' | 'punya' | 'papa' | 'debts' | 'remedies' | 'dossier'>('ledger');
+  const [activeTab, setActiveTab] = useState<'confession' | 'gita' | 'ledger' | 'punya' | 'papa' | 'debts' | 'remedies' | 'dossier'>('confession');
   const [filterType, setFilterType] = useState<'all' | 'punya' | 'papa'>('all');
 
   // Add Item Modals
@@ -282,6 +284,19 @@ export const KarmaScreen: React.FC<KarmaScreenProps> = ({ theme, onNavigate }) =
     }));
   };
 
+  // Direct Add Karma Item (from Gita Engine or Oracle)
+  const handleDirectAddKarmaItem = (newItem: KarmaItem) => {
+    setProfiles(prev => prev.map(prof => {
+      if (prof.id === currentProfile.id) {
+        return {
+          ...prof,
+          karmaList: [newItem, ...prof.karmaList]
+        };
+      }
+      return prof;
+    }));
+  };
+
   // Create New Person Profile
   const handleCreateProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -340,12 +355,19 @@ export const KarmaScreen: React.FC<KarmaScreenProps> = ({ theme, onNavigate }) =
   }, [currentProfile, filterType]);
 
   return (
-    <div className={`min-h-screen pb-20 transition-colors duration-300 ${
+    <div className={`min-h-screen pb-20 transition-colors duration-300 relative ${
       isDark ? 'bg-[#06070a] text-slate-100' : 'bg-[#faf7ee] text-slate-900'
     }`}>
+      {/* Light Theme Photo Background for Karma */}
+      {!isDark && (
+        <div 
+          className="absolute inset-0 z-0 opacity-15 mix-blend-multiply bg-cover bg-fixed bg-center pointer-events-none"
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1590455855078-4a94ec32fcd4?q=80&w=2000&auto=format&fit=crop')` }}
+        />
+      )}
 
       {/* 1. HERO BANNER & SHLOKA HEADER */}
-      <div className={`relative overflow-hidden border-b ${
+      <div className={`relative z-10 overflow-hidden border-b ${
         isDark 
           ? 'bg-gradient-to-b from-[#0e121e] via-[#090b14] to-[#06070a] border-amber-500/20' 
           : 'bg-gradient-to-b from-amber-50 via-orange-50/50 to-[#faf7ee] border-amber-200'
@@ -442,6 +464,56 @@ export const KarmaScreen: React.FC<KarmaScreenProps> = ({ theme, onNavigate }) =
 
       {/* 2. MAIN KARMIC COCKPIT & METRICS */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        {/* SPECIAL SACRED GITA CONFESSIONAL SANCTUM BANNER */}
+        <div 
+          onClick={() => {
+            cosmicAudio.playCosmicChime(528);
+            setActiveTab('confession');
+          }}
+          className="relative rounded-3xl p-6 sm:p-7 border-2 border-amber-500/60 shadow-[0_0_35px_rgba(245,158,11,0.35)] cursor-pointer overflow-hidden group transition-all transform hover:scale-[1.01]"
+          style={{
+            background: 'radial-gradient(ellipse at top left, #2a150a 0%, #160b05 50%, #080402 100%)'
+          }}
+        >
+          <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-amber-500/20 to-red-600/20 rounded-full blur-3xl pointer-events-none group-hover:opacity-100 transition-opacity" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-600 to-red-700 p-0.5 shadow-[0_0_20px_rgba(245,158,11,0.6)] flex items-center justify-center shrink-0">
+                <div className="w-full h-full rounded-2xl bg-black/80 flex items-center justify-center">
+                  <Flame className="w-8 h-8 text-amber-400 animate-pulse" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono tracking-widest text-amber-400 uppercase bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-500/40">
+                    श्रीमद्भगवद्गीता महापाप स्वीकारोक्ति एवं प्रायश्चित्त मण्डप
+                  </span>
+                  <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" /> BG 9.30 & 18.66
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-cinzel font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-orange-400">
+                  Sacred Gita Confessional, Cosmic Penal Decree & Agni Dissolution
+                </h2>
+                <p className="text-xs sm:text-sm text-amber-200/80 max-w-3xl leading-relaxed">
+                  Confess sins of speech, body, mind, or broken trust before the Divine Witness. Discover your exact karmic punishment across this life and the hereafter, obtain scriptural Prayashchitta rituals, and offer heavy guilt to the sacred Agni Kund.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
+              <button
+                onClick={() => onNavigate && onNavigate('mentor')}
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-cinzel font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.5)] flex items-center gap-2 cursor-pointer"
+              >
+                <span>Enter Sanctum Altar</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
         
         {/* A. Top Stat Cards: Punya vs Papa & Net Scale */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -566,6 +638,8 @@ export const KarmaScreen: React.FC<KarmaScreenProps> = ({ theme, onNavigate }) =
         {/* B. NAVIGATION TABS */}
         <div className="border-b border-amber-500/20 flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
           {[
+            { id: 'confession', label: '🔥 Gita Sin Confession & Prayashchitta (पाप स्वीकारोक्ति एवं प्रायश्चित्त मण्डप)', desc: 'Sacred Altar, Penal Code & Agni Dissolution' },
+            { id: 'gita', label: '🕉️ Bhagavad Gita Decider (संपूर्ण १८ अध्याय)', desc: '18 Chapters & Gita Decision Oracle' },
             { id: 'ledger', label: '📖 Complete Karmic Ledger', desc: 'Timeline of Deeds & Sins' },
             { id: 'punya', label: '✨ Good Deeds (Punya)', desc: 'Virtues & Merit' },
             { id: 'papa', label: '⚠️ Sins & Transgressions (Papa)', desc: 'Flaws & Karmic Toll' },
@@ -583,7 +657,7 @@ export const KarmaScreen: React.FC<KarmaScreenProps> = ({ theme, onNavigate }) =
                 }}
                 className={`px-4 py-2.5 rounded-xl font-mono text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
                   isActive
-                    ? 'bg-amber-500/25 border border-amber-400 text-amber-200 shadow-[0_0_15px_rgba(251,191,36,0.3)]'
+                    ? 'bg-gradient-to-r from-amber-600/40 via-orange-600/40 to-red-600/40 border border-amber-400 text-amber-200 shadow-[0_0_20px_rgba(251,191,36,0.35)]'
                     : 'bg-black/40 hover:bg-black/60 border border-white/10 text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -593,7 +667,25 @@ export const KarmaScreen: React.FC<KarmaScreenProps> = ({ theme, onNavigate }) =
           })}
         </div>
 
-        {/* C. TAB 1: COMPLETE LEDGER */}
+        {/* C. TAB -1: SACRED GITA CONFESSIONAL & ATONEMENT SANCTUM */}
+        {activeTab === 'confession' && (
+          <GitaConfessionSanctum
+            isDark={isDark}
+            currentProfile={currentProfile}
+            onAddKarmaItem={handleDirectAddKarmaItem}
+          />
+        )}
+
+        {/* D. TAB 0: BHAGAVAD GITA DECISION ENGINE & 18 ADHYAYAS */}
+        {activeTab === 'gita' && (
+          <KarmaGitaSection
+            isDark={isDark}
+            currentProfile={currentProfile}
+            onAddKarmaItem={handleDirectAddKarmaItem}
+          />
+        )}
+
+        {/* E. TAB 1: COMPLETE LEDGER */}
         {activeTab === 'ledger' && (
           <div className="space-y-6">
             
